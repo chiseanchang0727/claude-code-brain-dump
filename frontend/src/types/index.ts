@@ -30,6 +30,7 @@ export interface RegionDef {
   boxes: string[]   // box IDs to encompass
   padding?: number  // px padding around the group
   color?: string    // stroke + label color, defaults to zinc
+  labelAlign?: 'left' | 'center'
 }
 
 export interface PanelDiagram {

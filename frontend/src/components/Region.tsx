@@ -45,8 +45,9 @@ export function Region({ region, boxes, containerSize }: Props) {
         strokeDasharray="6 4"
       />
       <text
-        x={x1 + 12}
-        y={y2 + 14}
+        x={region.labelAlign === 'center' ? (x1 + x2) / 2 : x1 + 12}
+        y={region.labelAlign === 'center' ? y1 - 6 : y2 + 14}
+        textAnchor={region.labelAlign === 'center' ? 'middle' : 'start'}
         fill={region.color ?? '#71717a'}
         fontSize="11"
         fontWeight="500"

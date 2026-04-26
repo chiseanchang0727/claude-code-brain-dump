@@ -31,20 +31,6 @@ export const scenes: SceneDef[] = [
         navigateTo: 'query-engine-detail',
       },
       {
-        id: 'system-prompt',
-        label: 'System Prompt',
-        sublabel: 'fetchSystemPromptParts()',
-        x: 38, y: 22,
-        detail: { contentKey: 'architecture-flow/system-prompt' },
-      },
-      {
-        id: 'record-transcript',
-        label: 'Record Transcript',
-        sublabel: 'sessionStorage.ts',
-        x: 62, y: 22,
-        detail: { contentKey: 'architecture-flow/record-transcript' },
-      },
-      {
         id: 'query-loop',
         label: 'Query Loop',
         sublabel: 'query.ts',
@@ -62,8 +48,6 @@ export const scenes: SceneDef[] = [
     arrows: [
       { from: 'cli', to: 'commander' },
       { from: 'commander', to: 'query-engine' },
-      { from: 'query-engine', to: 'system-prompt', label: 'compose' },
-      { from: 'query-engine', to: 'record-transcript', label: 'persist' },
       { from: 'query-engine', to: 'query-loop', label: 'messages[]' },
       { from: 'query-loop', to: 'result', label: 'Terminal' },
     ],
@@ -77,6 +61,13 @@ export const scenes: SceneDef[] = [
     title: 'QueryEngine — per turn',
     crumb: 'QueryEngine',
     boxes: [
+      {
+        id: 'system-prompt',
+        label: 'System Prompt',
+        sublabel: 'fetchSystemPromptParts()',
+        x: 10, y: 68,
+        detail: { contentKey: 'architecture-flow/system-prompt' },
+      },
       {
         id: 'tools',
         label: 'Tools',
@@ -175,6 +166,7 @@ export const scenes: SceneDef[] = [
       },
     ],
     arrows: [
+      { from: 'system-prompt', to: 'prepare' },
       { from: 'tools',         to: 'prepare' },
       { from: 'model-config',  to: 'prepare' },
       { from: 'mcp-servers',   to: 'prepare' },
@@ -189,6 +181,13 @@ export const scenes: SceneDef[] = [
       { from: 'merge',         to: 'session-state' },
     ],
     regions: [
+      {
+        label: 'QueryEngine',
+        boxes: ['system-prompt', 'tools', 'model-config', 'mcp-servers', 'custom-prompts', 'prepare', 'understand', 'save', 'run', 'transcript-file', 'disk', 'per-turn-state', 'merge', 'session-state'],
+        padding: 48,
+        color: '#52525b',
+        labelAlign: 'center',
+      },
       {
         label: 'Session State scope',
         boxes: ['prepare', 'understand', 'save', 'run'],

@@ -30,7 +30,7 @@ export function Scene({ scene, direction, editMode, onNavigateScene, onOpenConte
     )
     obs.observe(el)
     return () => obs.disconnect()
-  }, [])
+  }, [activePanel])
 
   useEffect(() => {
     setDraggedPositions({})
