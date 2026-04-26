@@ -1,26 +1,23 @@
 # QueryEngine
 
-**File:** `src/QueryEngine.ts:209` — `submitMessage()`
+The coordinator for each conversation turn. It holds everything that needs to survive across multiple turns, and orchestrates the steps that happen within one turn.
 
-The entry point for each conversation turn. It owns session-level state and delegates per-turn execution to `query.ts`.
+## What it remembers
 
-## What it owns
+- The full message history of the session
+- How many tokens have been used and what it has cost so far
+- Which tool permissions have been denied by the user
+- A running transcript of everything that happened
 
-- Message history across turns
-- Cumulative token usage and cost
-- Permission denial tracking
-- Transcript recording
+## What happens each turn
 
-## Per-turn flow
+When a user message arrives, QueryEngine runs through four stages before handing back a response:
 
-Each call to `submitMessage()` does:
+1. **Prepare** — figures out what instructions to give the model for this turn (which tools are available, what the current context is)
+2. **Understand** — reads the user's message, handles any special commands, decides whether an actual AI call is even needed
+3. **Save** — writes the user message to disk before anything else happens, so nothing is lost if something goes wrong
+4. **Run** — hands off to the query loop, which does the actual back-and-forth with the model until it's done
 
-1. Call `fetchSystemPromptParts()` to compose the system prompt
-2. Call `processUserInput()` to parse the message, handle `/slash` commands, decide if an API call is needed
-3. Call `recordTranscript()` to persist the user message before the API call
-4. Delegate to `query()` for the API + tool execution loop
-5. Receive the `Terminal` back, normalize the final message, yield the result
+## Its relationship to the query loop
 
-## Relationship to query.ts
-
-`QueryEngine` owns **session state**. `query.ts` owns **per-turn execution state** (the `State` struct, compact tracking, turn count). They are cleanly separated.
+QueryEngine is the **session manager** — it knows who the user is and what has happened so far. The query loop is the **turn executor** — it knows what to do right now, this iteration. Neither does the other's job.

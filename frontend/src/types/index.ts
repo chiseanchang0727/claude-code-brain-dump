@@ -2,17 +2,18 @@ export interface DetailDef {
   contentKey: string  // maps to src/content/{contentKey}.md
 }
 
-export type BoxVariant = 'default' | 'green' | 'yellow' | 'amber' | 'red'
+export type BoxVariant = 'default' | 'green' | 'yellow' | 'amber' | 'red' | 'ghost'
 
 export interface BoxDef {
   id: string
   label: string
   sublabel?: string
-  x: number          // % from left
-  y: number          // % from top
+  description?: string  // short text shown in a chat bubble on click
+  x: number             // % from left
+  y: number             // % from top
   variant?: BoxVariant
   detail?: DetailDef
-  navigateTo?: string  // scene id — click navigates instead of opening detail
+  navigateTo?: string
 }
 
 export interface ArrowDef {
@@ -21,6 +22,14 @@ export interface ArrowDef {
   label?: string
   dashed?: boolean
   curved?: boolean   // draws a bezier arc instead of straight line
+  color?: string
+}
+
+export interface RegionDef {
+  label: string
+  boxes: string[]   // box IDs to encompass
+  padding?: number  // px padding around the group
+  color?: string    // stroke + label color, defaults to zinc
 }
 
 export interface SceneDef {
@@ -29,6 +38,7 @@ export interface SceneDef {
   crumb: string
   boxes: BoxDef[]
   arrows: ArrowDef[]
+  regions?: RegionDef[]
 }
 
 export type HistoryItem =

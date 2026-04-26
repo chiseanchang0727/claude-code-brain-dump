@@ -44,7 +44,7 @@ export function Arrow({ arrow, boxes, containerSize }: Props) {
   const from = getCenter(fromBox, w, h)
   const to = getCenter(toBox, w, h)
   const markerId = `arrow-${arrow.from}-${arrow.to}`
-  const color = theme.arrow.color
+  const color = arrow.color ?? theme.arrow.color
 
   let pathD: string
   let midX: number

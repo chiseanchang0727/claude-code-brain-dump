@@ -26,6 +26,7 @@ export const theme = {
       yellow:  'bg-yellow-950/60 text-yellow-100',
       amber:   'bg-orange-950/60 text-orange-100',
       red:     'bg-red-950/60 text-red-100',
+      ghost:   'bg-green-950 text-green-100',
     } satisfies Record<BoxVariant, string>,
     border: {
       default: { idle: 'border-zinc-600',   hover: 'hover:border-zinc-400',   selected: 'border-zinc-300 shadow-zinc-700' },
@@ -33,6 +34,7 @@ export const theme = {
       yellow:  { idle: 'border-yellow-800', hover: 'hover:border-yellow-500', selected: 'border-yellow-400 shadow-yellow-900' },
       amber:   { idle: 'border-orange-800', hover: 'hover:border-orange-500', selected: 'border-orange-400 shadow-orange-900' },
       red:     { idle: 'border-red-800',    hover: 'hover:border-red-500',    selected: 'border-red-400 shadow-red-900' },
+      ghost:   { idle: 'border-green-700',  hover: 'hover:border-green-400',  selected: 'border-green-400' },
     } satisfies Record<BoxVariant, { idle: string; hover: string; selected: string }>,
     sublabel: {
       default: 'text-zinc-500',
@@ -40,6 +42,7 @@ export const theme = {
       yellow:  'text-yellow-500',
       amber:   'text-orange-500',
       red:     'text-red-500',
+      ghost:   'text-green-600',
     } satisfies Record<BoxVariant, string>,
   },
 

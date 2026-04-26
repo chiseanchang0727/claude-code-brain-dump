@@ -1,6 +1,6 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { AnimatePresence } from 'framer-motion'
-import { scenes } from './data/scenes'
+import { scenes } from './data/index'
 import { useSceneNav } from './hooks/useSceneNav'
 import { Scene } from './components/Scene'
 import { ContentPage } from './components/ContentPage'
@@ -12,6 +12,8 @@ export default function App() {
   const prevLengthRef = useRef(history.length)
   const direction = history.length >= prevLengthRef.current ? 1 : -1
   prevLengthRef.current = history.length
+
+  const [editMode, setEditMode] = useState(false)
 
   const nodeKey = current.type === 'scene' ? `scene-${current.idx}` : `content-${current.contentKey}`
 
@@ -25,6 +27,7 @@ export default function App() {
               key={nodeKey}
               scene={scenes[current.idx]}
               direction={direction}
+              editMode={editMode}
               onNavigateScene={pushScene}
               onOpenContent={pushContent}
             />
@@ -37,8 +40,20 @@ export default function App() {
           )}
         </AnimatePresence>
       </div>
-      <div className={`px-8 py-3 ${theme.app.footer}`}>
-        Click a box to read · ← Esc to go back
+      <div className={`px-8 py-3 flex items-center justify-between ${theme.app.footer}`}>
+        <span>{editMode ? 'Drag boxes to reposition · Save Layout when done' : 'Click a box to read · ← Esc to go back'}</span>
+        {import.meta.env.DEV && (
+          <button
+            onClick={() => setEditMode(m => !m)}
+            className={`text-xs px-3 py-1 rounded-md border transition-colors ${
+              editMode
+                ? 'bg-amber-500/20 border-amber-500/50 text-amber-300'
+                : 'border-zinc-600 text-zinc-400 hover:border-zinc-400 hover:text-zinc-200'
+            }`}
+          >
+            {editMode ? 'Editing' : 'Edit Layout'}
+          </button>
+        )}
       </div>
     </div>
   )
