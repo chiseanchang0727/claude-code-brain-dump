@@ -32,6 +32,20 @@ export interface RegionDef {
   color?: string    // stroke + label color, defaults to zinc
 }
 
+export interface PanelDiagram {
+  boxes: BoxDef[]
+  arrows: ArrowDef[]
+  regions?: RegionDef[]
+  height?: number
+}
+
+export interface PanelDef {
+  label: string
+  contentKey: string
+  diagram?: PanelDiagram
+  animation?: 'async-generator'
+}
+
 export interface SceneDef {
   id: string
   title: string
@@ -39,6 +53,7 @@ export interface SceneDef {
   boxes: BoxDef[]
   arrows: ArrowDef[]
   regions?: RegionDef[]
+  panels?: PanelDef[]
 }
 
 export type HistoryItem =

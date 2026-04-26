@@ -4,6 +4,7 @@ import type { SceneDef, BoxDef } from '../types'
 import { Box } from './Box'
 import { Arrow } from './Arrow'
 import { Region } from './Region'
+import { ScenePanel } from './ScenePanel'
 
 interface Props {
   scene: SceneDef
@@ -19,6 +20,7 @@ export function Scene({ scene, direction, editMode, onNavigateScene, onOpenConte
   const [bubbleId, setBubbleId] = useState<string | null>(null)
   const [draggedPositions, setDraggedPositions] = useState<Record<string, { x: number; y: number }>>({})
   const [saving, setSaving] = useState(false)
+  const [activePanel, setActivePanel] = useState<number | null>(null)
 
   useEffect(() => {
     const el = containerRef.current
@@ -30,8 +32,10 @@ export function Scene({ scene, direction, editMode, onNavigateScene, onOpenConte
     return () => obs.disconnect()
   }, [])
 
-  // Reset drag positions when scene changes
-  useEffect(() => { setDraggedPositions({}) }, [scene.id])
+  useEffect(() => {
+    setDraggedPositions({})
+    setActivePanel(null)
+  }, [scene.id])
 
   const effectiveBoxes: BoxDef[] = scene.boxes.map(box => ({
     ...box,
@@ -70,48 +74,84 @@ export function Scene({ scene, direction, editMode, onNavigateScene, onOpenConte
     }
   }
 
+  const hasPanels = scene.panels && scene.panels.length > 0
+
   return (
     <motion.div
       key={scene.id}
-      className="absolute inset-0"
+      className="absolute inset-0 flex flex-col"
       initial={{ x: direction * 100 + '%', opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       exit={{ x: direction * -100 + '%', opacity: 0 }}
       transition={{ type: 'spring', stiffness: 260, damping: 30 }}
     >
-      <div
-        ref={containerRef}
-        className="relative w-full h-full"
-        onClick={() => { if (!editMode) setBubbleId(null) }}
-      >
-        <svg className="absolute inset-0 w-full h-full pointer-events-none overflow-visible">
-          {scene.regions?.map(region => (
-            <Region key={region.label} region={region} boxes={effectiveBoxes} containerSize={size} />
-          ))}
-          {scene.arrows.map(arrow => (
-            <Arrow key={`${arrow.from}-${arrow.to}`} arrow={arrow} boxes={effectiveBoxes} containerSize={size} />
-          ))}
-        </svg>
-        {effectiveBoxes.map(box => (
-          <Box
-            key={box.id}
-            box={box}
-            editMode={editMode}
-            bubbleOpen={bubbleId === box.id}
-            onToggleBubble={() => setBubbleId(bubbleId === box.id ? null : box.id)}
-            onNavigateScene={onNavigateScene}
-            onOpenContent={onOpenContent}
-            onDragEnd={handleDragEnd}
-          />
-        ))}
-        {editMode && hasDragged && (
+      {hasPanels && (
+        <div className="flex shrink-0 border-b border-zinc-800 px-4">
           <button
-            onClick={saveLayout}
-            disabled={saving}
-            className="absolute bottom-4 right-4 px-4 py-2 rounded-lg bg-amber-500 text-black text-sm font-semibold hover:bg-amber-400 disabled:opacity-50 transition-colors"
+            onClick={() => setActivePanel(null)}
+            className={`px-4 py-2.5 text-sm transition-colors border-b-2 -mb-px ${
+              activePanel === null
+                ? 'text-white border-amber-500'
+                : 'text-zinc-500 hover:text-zinc-300 border-transparent'
+            }`}
           >
-            {saving ? 'Saving…' : 'Save Layout'}
+            Diagram
           </button>
+          {scene.panels!.map((panel, i) => (
+            <button
+              key={i}
+              onClick={() => setActivePanel(i)}
+              className={`px-4 py-2.5 text-sm transition-colors border-b-2 -mb-px ${
+                activePanel === i
+                  ? 'text-white border-amber-500'
+                  : 'text-zinc-500 hover:text-zinc-300 border-transparent'
+              }`}
+            >
+              {panel.label}
+            </button>
+          ))}
+        </div>
+      )}
+
+      <div className="relative flex-1 overflow-hidden">
+        {activePanel !== null && scene.panels ? (
+          <ScenePanel panel={scene.panels[activePanel]} />
+        ) : (
+          <div
+            ref={containerRef}
+            className="relative w-full h-full"
+            onClick={() => { if (!editMode) setBubbleId(null) }}
+          >
+            <svg className="absolute inset-0 w-full h-full pointer-events-none overflow-visible">
+              {scene.regions?.map(region => (
+                <Region key={region.label} region={region} boxes={effectiveBoxes} containerSize={size} />
+              ))}
+              {scene.arrows.map(arrow => (
+                <Arrow key={`${arrow.from}-${arrow.to}`} arrow={arrow} boxes={effectiveBoxes} containerSize={size} />
+              ))}
+            </svg>
+            {effectiveBoxes.map(box => (
+              <Box
+                key={box.id}
+                box={box}
+                editMode={editMode}
+                bubbleOpen={bubbleId === box.id}
+                onToggleBubble={() => setBubbleId(bubbleId === box.id ? null : box.id)}
+                onNavigateScene={onNavigateScene}
+                onOpenContent={onOpenContent}
+                onDragEnd={handleDragEnd}
+              />
+            ))}
+            {editMode && hasDragged && (
+              <button
+                onClick={saveLayout}
+                disabled={saving}
+                className="absolute bottom-4 right-4 px-4 py-2 rounded-lg bg-amber-500 text-black text-sm font-semibold hover:bg-amber-400 disabled:opacity-50 transition-colors"
+              >
+                {saving ? 'Saving…' : 'Save Layout'}
+              </button>
+            )}
+          </div>
         )}
       </div>
     </motion.div>

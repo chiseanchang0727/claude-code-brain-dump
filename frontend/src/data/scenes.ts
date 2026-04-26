@@ -196,6 +196,13 @@ export const scenes: SceneDef[] = [
         color: '#4ade80',
       },
     ],
+    panels: [
+      {
+        label: 'QueryEngine ↔ query loop',
+        contentKey: 'query-engine-detail/async-generator',
+        animation: 'async-generator',
+      },
+    ],
   },
 
   // ─────────────────────────────────────────────
