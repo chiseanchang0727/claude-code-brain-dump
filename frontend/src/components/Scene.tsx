@@ -11,7 +11,7 @@ interface Props {
   direction: number
   editMode?: boolean
   onNavigateScene: (sceneId: string) => void
-  onOpenContent: (contentKey: string, crumb: string) => void
+  onOpenContent: (contentKey: string, crumb: string, defaultPanel?: number) => void
 }
 
 export function Scene({ scene, direction, editMode, onNavigateScene, onOpenContent }: Props) {

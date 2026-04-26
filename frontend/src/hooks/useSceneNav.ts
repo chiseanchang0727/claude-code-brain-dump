@@ -14,8 +14,8 @@ export function useSceneNav(scenes: SceneDef[]) {
       setHistory(h => [...h, { type: 'scene', idx, crumb: scenes[idx].crumb }])
   }, [scenes])
 
-  const pushContent = useCallback((contentKey: string, crumb: string) => {
-    setHistory(h => [...h, { type: 'content', contentKey, crumb }])
+  const pushContent = useCallback((contentKey: string, crumb: string, defaultPanel?: number) => {
+    setHistory(h => [...h, { type: 'content', contentKey, crumb, defaultPanel }])
   }, [])
 
   const popTo = useCallback((position: number) => {

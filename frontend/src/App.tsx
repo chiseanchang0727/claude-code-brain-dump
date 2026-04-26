@@ -36,6 +36,7 @@ export default function App() {
               key={nodeKey}
               contentKey={current.contentKey}
               direction={direction}
+              defaultPanel={current.type === 'content' ? current.defaultPanel : undefined}
             />
           )}
         </AnimatePresence>

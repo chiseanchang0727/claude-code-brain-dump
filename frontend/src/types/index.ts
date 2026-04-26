@@ -1,8 +1,9 @@
 export interface DetailDef {
   contentKey: string  // maps to src/content/{contentKey}.md
+  defaultPanel?: number
 }
 
-export type BoxVariant = 'default' | 'green' | 'yellow' | 'amber' | 'red' | 'ghost'
+export type BoxVariant = 'default' | 'green' | 'yellow' | 'amber' | 'red' | 'ghost' | 'blue'
 
 export interface BoxDef {
   id: string
@@ -42,9 +43,9 @@ export interface PanelDiagram {
 
 export interface PanelDef {
   label: string
-  contentKey: string
+  contentKey?: string
   diagram?: PanelDiagram
-  animation?: 'async-generator'
+  animation?: 'async-generator' | 'transcript'
 }
 
 export interface SceneDef {
@@ -59,4 +60,4 @@ export interface SceneDef {
 
 export type HistoryItem =
   | { type: 'scene';   idx: number;      crumb: string }
-  | { type: 'content'; contentKey: string; crumb: string }
+  | { type: 'content'; contentKey: string; crumb: string; defaultPanel?: number }

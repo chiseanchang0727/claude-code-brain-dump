@@ -133,7 +133,8 @@ export const scenes: SceneDef[] = [
         label: 'Transcript File',
         sublabel: '.jsonl on disk',
         x: 72, y: 30,
-        description: 'One JSON line appended per message — user, assistant, tool results, final cost. Written before the API call so nothing is lost on crash.',
+        variant: 'blue',
+        detail: { contentKey: 'query-engine-detail/transcript-file', defaultPanel: 0 },
       },
       {
         id: 'disk',
@@ -189,7 +190,7 @@ export const scenes: SceneDef[] = [
         labelAlign: 'center',
       },
       {
-        label: 'Session State scope',
+        label: '',
         boxes: ['prepare', 'understand', 'save', 'run'],
         padding: 28,
         color: '#4ade80',

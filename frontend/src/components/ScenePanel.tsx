@@ -5,6 +5,7 @@ import { theme } from '../theme'
 import type { PanelDef } from '../types'
 import { DiagramCanvas } from './DiagramCanvas'
 import { AsyncGeneratorAnimation } from './AsyncGeneratorAnimation'
+import { TranscriptAnimation } from './TranscriptAnimation'
 
 interface Props {
   panel: PanelDef
@@ -13,13 +14,19 @@ interface Props {
 const md = theme.panel.md
 
 export function ScenePanel({ panel }: Props) {
-  const raw = getContent(panel.contentKey)
+  const raw = panel.contentKey ? getContent(panel.contentKey) : null
   const parsed = raw ? parseContent(raw) : null
 
-  if (!parsed) return <p className="text-zinc-500 p-8">Content not found: {panel.contentKey}</p>
+  if (!panel.animation && !panel.diagram && !parsed)
+    return <p className="text-zinc-500 p-8">Content not found: {panel.contentKey}</p>
 
   return (
     <div className="overflow-y-auto h-full">
+      {panel.animation === 'transcript' && (
+        <div className="border-b border-zinc-800" style={{ height: 300 }}>
+          <TranscriptAnimation />
+        </div>
+      )}
       {panel.animation === 'async-generator' && (
         <div className="border-b border-zinc-800" style={{ height: 300 }}>
           <AsyncGeneratorAnimation />

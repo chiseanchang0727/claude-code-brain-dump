@@ -9,7 +9,7 @@ interface Props {
   bubbleOpen: boolean
   onToggleBubble: () => void
   onNavigateScene: (sceneId: string) => void
-  onOpenContent: (contentKey: string, crumb: string) => void
+  onOpenContent: (contentKey: string, crumb: string, defaultPanel?: number) => void
   onDragEnd?: (boxId: string, dx: number, dy: number) => void
 }
 
@@ -24,7 +24,7 @@ export function Box({ box, editMode, bubbleOpen, onToggleBubble, onNavigateScene
     if (editMode) return
     e.stopPropagation()
     if (box.navigateTo) onNavigateScene(box.navigateTo)
-    else if (box.detail) onOpenContent(box.detail.contentKey, box.label)
+    else if (box.detail) onOpenContent(box.detail.contentKey, box.label, box.detail.defaultPanel)
     else if (box.description) onToggleBubble()
   }
 

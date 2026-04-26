@@ -20,29 +20,66 @@ export const theme = {
       sublabel: 'text-zinc-400',
       cta: 'text-zinc-300',
     },
+
     bg: {
       default: 'bg-zinc-800 text-zinc-100',
-      green:   'bg-green-950/60 text-green-100',
-      yellow:  'bg-yellow-950/60 text-yellow-100',
-      amber:   'bg-orange-950/60 text-orange-100',
-      red:     'bg-red-950/60 text-red-100',
-      ghost:   'bg-green-950 text-green-100',
+      green: 'bg-green-950/60 text-green-100',
+      yellow: 'bg-yellow-950/60 text-yellow-100',
+      blue: 'bg-blue-950/60 text-blue-100',
+      amber: 'bg-orange-950/60 text-orange-100',
+      red: 'bg-red-950/60 text-red-100',
+      ghost: 'bg-green-950 text-green-100',
     } satisfies Record<BoxVariant, string>,
+
     border: {
-      default: { idle: 'border-zinc-600',   hover: 'hover:border-zinc-400',   selected: 'border-zinc-300 shadow-zinc-700' },
-      green:   { idle: 'border-green-800',  hover: 'hover:border-green-500',  selected: 'border-green-400 shadow-green-900' },
-      yellow:  { idle: 'border-yellow-800', hover: 'hover:border-yellow-500', selected: 'border-yellow-400 shadow-yellow-900' },
-      amber:   { idle: 'border-orange-800', hover: 'hover:border-orange-500', selected: 'border-orange-400 shadow-orange-900' },
-      red:     { idle: 'border-red-800',    hover: 'hover:border-red-500',    selected: 'border-red-400 shadow-red-900' },
-      ghost:   { idle: 'border-green-700',  hover: 'hover:border-green-400',  selected: 'border-green-400' },
-    } satisfies Record<BoxVariant, { idle: string; hover: string; selected: string }>,
+      default: {
+        idle: 'border-zinc-600',
+        hover: 'hover:border-zinc-400',
+        selected: 'border-zinc-300 shadow-zinc-700',
+      },
+      green: {
+        idle: 'border-green-800',
+        hover: 'hover:border-green-500',
+        selected: 'border-green-400 shadow-green-900',
+      },
+      yellow: {
+        idle: 'border-yellow-800',
+        hover: 'hover:border-yellow-500',
+        selected: 'border-yellow-400 shadow-yellow-900',
+      },
+      blue: {
+        idle: 'border-blue-800',
+        hover: 'hover:border-blue-500',
+        selected: 'border-blue-400 shadow-blue-900',
+      },
+      amber: {
+        idle: 'border-orange-800',
+        hover: 'hover:border-orange-500',
+        selected: 'border-orange-400 shadow-orange-900',
+      },
+      red: {
+        idle: 'border-red-800',
+        hover: 'hover:border-red-500',
+        selected: 'border-red-400 shadow-red-900',
+      },
+      ghost: {
+        idle: 'border-green-700',
+        hover: 'hover:border-green-400',
+        selected: 'border-green-400',
+      },
+    } satisfies Record<
+      BoxVariant,
+      { idle: string; hover: string; selected: string }
+    >,
+
     sublabel: {
       default: 'text-zinc-500',
-      green:   'text-green-500',
-      yellow:  'text-yellow-500',
-      amber:   'text-orange-500',
-      red:     'text-red-500',
-      ghost:   'text-green-600',
+      green: 'text-green-500',
+      yellow: 'text-yellow-500',
+      blue: 'text-blue-500',
+      amber: 'text-orange-500',
+      red: 'text-red-500',
+      ghost: 'text-green-600',
     } satisfies Record<BoxVariant, string>,
   },
 
@@ -58,11 +95,13 @@ export const theme = {
     md: {
       h2: 'text-zinc-200 font-semibold text-sm mt-5 mb-2 first:mt-0',
       h3: 'text-zinc-400 font-semibold text-xs mt-4 mb-1.5 uppercase tracking-wide',
-      p:  'text-zinc-400 text-sm leading-relaxed mb-3',
+      p: 'text-zinc-400 text-sm leading-relaxed mb-3',
       ul: 'text-zinc-400 text-sm space-y-1 mb-3 ml-4 list-disc',
       ol: 'text-zinc-400 text-sm space-y-1 mb-3 ml-4 list-decimal',
-      codeBlock: 'bg-zinc-800 text-zinc-300 text-xs font-mono rounded-lg px-4 py-3 mb-3 overflow-x-auto whitespace-pre border border-zinc-700',
-      codeInline: 'bg-zinc-800 text-zinc-300 text-xs font-mono rounded px-1.5 py-0.5 border border-zinc-700',
+      codeBlock:
+        'bg-zinc-800 text-zinc-300 text-xs font-mono rounded-lg px-4 py-3 mb-3 overflow-x-auto whitespace-pre border border-zinc-700',
+      codeInline:
+        'bg-zinc-800 text-zinc-300 text-xs font-mono rounded px-1.5 py-0.5 border border-zinc-700',
       th: 'text-left text-zinc-300 font-semibold border-b border-zinc-700 pb-1.5 pr-4',
       td: 'border-b border-zinc-800 py-1.5 pr-4 text-zinc-400',
       strong: 'text-zinc-200 font-semibold',
