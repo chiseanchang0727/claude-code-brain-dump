@@ -122,14 +122,6 @@ export function Scene({ scene, direction, editMode, onNavigateScene, onOpenConte
             className="relative w-full h-full"
             onClick={() => { if (!editMode) setBubbleId(null) }}
           >
-            <svg className="absolute inset-0 w-full h-full pointer-events-none overflow-visible">
-              {scene.regions?.map(region => (
-                <Region key={region.label} region={region} boxes={effectiveBoxes} containerSize={size} />
-              ))}
-              {scene.arrows.map(arrow => (
-                <Arrow key={`${arrow.from}-${arrow.to}`} arrow={arrow} boxes={effectiveBoxes} containerSize={size} />
-              ))}
-            </svg>
             {effectiveBoxes.map(box => (
               <Box
                 key={box.id}
@@ -142,6 +134,14 @@ export function Scene({ scene, direction, editMode, onNavigateScene, onOpenConte
                 onDragEnd={handleDragEnd}
               />
             ))}
+            <svg className="absolute inset-0 w-full h-full pointer-events-none overflow-visible">
+              {scene.regions?.map(region => (
+                <Region key={region.label} region={region} boxes={effectiveBoxes} containerSize={size} />
+              ))}
+              {scene.arrows.map(arrow => (
+                <Arrow key={`${arrow.from}-${arrow.to}`} arrow={arrow} boxes={effectiveBoxes} containerSize={size} />
+              ))}
+            </svg>
             {editMode && hasDragged && (
               <button
                 onClick={saveLayout}

@@ -9,8 +9,8 @@ interface Props {
 }
 
 // Half-dimensions of the box (w-40 = 160px → half 80, height ~56px → half 28)
-const BOX_HW = 82  // half-width, slightly padded
-const BOX_HH = 30  // half-height, slightly padded
+const BOX_HW = 83  // half-width: w-40=160px → half 80 + 3px so arrowhead tip lands at box edge
+const BOX_HH = 35  // half-height: py-2.5 + label + sublabel ≈ 58px → half 29 + 3px tip offset
 
 function getCenter(box: BoxDef, w: number, h: number) {
   return { x: (box.x / 100) * w, y: (box.y / 100) * h }
