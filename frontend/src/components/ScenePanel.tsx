@@ -6,16 +6,22 @@ import type { PanelDef } from '../types'
 import { DiagramCanvas } from './DiagramCanvas'
 import { AsyncGeneratorAnimation } from './AsyncGeneratorAnimation'
 import { TranscriptAnimation } from './TranscriptAnimation'
+import { FlowOverviewPanel } from './FlowOverviewPanel'
 
 interface Props {
   panel: PanelDef
+  onNavigateScene: (sceneId: string) => void
+  onOpenContent: (contentKey: string, crumb: string, defaultPanel?: number) => void
 }
 
 const md = theme.panel.md
 
-export function ScenePanel({ panel }: Props) {
+export function ScenePanel({ panel, onNavigateScene, onOpenContent }: Props) {
   const raw = panel.contentKey ? getContent(panel.contentKey) : null
   const parsed = raw ? parseContent(raw) : null
+
+  if (panel.animation === 'flow-overview')
+    return <FlowOverviewPanel onNavigateScene={onNavigateScene} onOpenContent={onOpenContent} />
 
   if (!panel.animation && !panel.diagram && !parsed)
     return <p className="text-zinc-500 p-8">Content not found: {panel.contentKey}</p>

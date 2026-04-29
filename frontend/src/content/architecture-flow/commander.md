@@ -2,7 +2,7 @@
 
 **File:** `src/main.tsx`
 
-Parses CLI arguments using the Commander.js library and bootstraps the session.
+Reads user input from the command line, interprets it using Commander.js, and then initializes the application (session) accordingly.
 
 ## What it does
 

@@ -15,6 +15,7 @@ export interface BoxDef {
   variant?: BoxVariant
   detail?: DetailDef
   navigateTo?: string
+  elevated?: boolean    // render above the SVG arrow/region layer
 }
 
 export interface ArrowDef {
@@ -45,7 +46,7 @@ export interface PanelDef {
   label: string
   contentKey?: string
   diagram?: PanelDiagram
-  animation?: 'async-generator' | 'transcript' | 'microcompact' | 'snip' | 'context-collapse' | 'autocompact'
+  animation?: 'async-generator' | 'transcript' | 'microcompact' | 'snip' | 'context-collapse' | 'autocompact' | 'flow-overview'
   layout?: 'split'
 }
 
@@ -57,6 +58,7 @@ export interface SceneDef {
   arrows: ArrowDef[]
   regions?: RegionDef[]
   panels?: PanelDef[]
+  hideDiagramTab?: boolean  // hides the Diagram tab; diagram code is preserved
 }
 
 export type HistoryItem =

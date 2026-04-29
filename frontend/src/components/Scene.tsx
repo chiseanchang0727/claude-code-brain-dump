@@ -20,7 +20,7 @@ export function Scene({ scene, direction, editMode, onNavigateScene, onOpenConte
   const [bubbleId, setBubbleId] = useState<string | null>(null)
   const [draggedPositions, setDraggedPositions] = useState<Record<string, { x: number; y: number }>>({})
   const [saving, setSaving] = useState(false)
-  const [activePanel, setActivePanel] = useState<number | null>(null)
+  const [activePanel, setActivePanel] = useState<number | null>(scene.hideDiagramTab ? 0 : null)
 
   useEffect(() => {
     const el = containerRef.current
@@ -34,7 +34,7 @@ export function Scene({ scene, direction, editMode, onNavigateScene, onOpenConte
 
   useEffect(() => {
     setDraggedPositions({})
-    setActivePanel(null)
+    setActivePanel(scene.hideDiagramTab ? 0 : null)
   }, [scene.id])
 
   const effectiveBoxes: BoxDef[] = scene.boxes.map(box => ({
@@ -85,7 +85,7 @@ export function Scene({ scene, direction, editMode, onNavigateScene, onOpenConte
       exit={{ x: direction * -100 + '%', opacity: 0 }}
       transition={{ type: 'spring', stiffness: 260, damping: 30 }}
     >
-      {hasPanels && (
+      {hasPanels && !scene.hideDiagramTab && (
         <div className="flex shrink-0 border-b border-zinc-800 px-4">
           <button
             onClick={() => setActivePanel(null)}
@@ -115,14 +115,14 @@ export function Scene({ scene, direction, editMode, onNavigateScene, onOpenConte
 
       <div className="relative flex-1 overflow-hidden">
         {activePanel !== null && scene.panels ? (
-          <ScenePanel panel={scene.panels[activePanel]} />
+          <ScenePanel panel={scene.panels[activePanel]} onNavigateScene={onNavigateScene} onOpenContent={onOpenContent} />
         ) : (
           <div
             ref={containerRef}
             className="relative w-full h-full"
             onClick={() => { if (!editMode) setBubbleId(null) }}
           >
-            {effectiveBoxes.map(box => (
+            {effectiveBoxes.filter(b => !b.elevated).map(box => (
               <Box
                 key={box.id}
                 box={box}
@@ -142,6 +142,18 @@ export function Scene({ scene, direction, editMode, onNavigateScene, onOpenConte
                 <Arrow key={`${arrow.from}-${arrow.to}`} arrow={arrow} boxes={effectiveBoxes} containerSize={size} />
               ))}
             </svg>
+            {effectiveBoxes.filter(b => b.elevated).map(box => (
+              <Box
+                key={box.id}
+                box={box}
+                editMode={editMode}
+                bubbleOpen={bubbleId === box.id}
+                onToggleBubble={() => setBubbleId(bubbleId === box.id ? null : box.id)}
+                onNavigateScene={onNavigateScene}
+                onOpenContent={onOpenContent}
+                onDragEnd={handleDragEnd}
+              />
+            ))}
             {editMode && hasDragged && (
               <button
                 onClick={saveLayout}

@@ -20,7 +20,7 @@ export const scenes: SceneDef[] = [
         id: 'commander',
         label: 'Commander.js',
         sublabel: 'main.tsx',
-        x: 26, y: 50,
+        x: 29, y: 50,
         detail: { contentKey: 'architecture-flow/commander' },
       },
       {
@@ -34,7 +34,7 @@ export const scenes: SceneDef[] = [
         id: 'query-loop',
         label: 'Query Loop',
         sublabel: 'query.ts',
-        x: 75, y: 50,
+        x: 71, y: 50,
         navigateTo: 'query-loop-detail',
       },
       {
@@ -51,6 +51,10 @@ export const scenes: SceneDef[] = [
       { from: 'query-engine', to: 'query-loop', label: 'messages[]' },
       { from: 'query-loop', to: 'result', label: 'Terminal' },
     ],
+    panels: [
+      { label: '💡 Overview', animation: 'flow-overview' },
+    ],
+    hideDiagramTab: true,
   },
 
   // ─────────────────────────────────────────────
@@ -163,6 +167,7 @@ export const scenes: SceneDef[] = [
         sublabel: 'persists across all turns',
         variant: 'ghost',
         x: 35, y: 82,
+        elevated: true,
         description: 'Same QueryEngine instance for the whole session. Holds mutableMessages (full history), totalUsage (accumulated cost), permissionDenials, and readFileState. Still here when the next user message arrives.',
       },
     ],
