@@ -37,7 +37,7 @@ Memory consolidation — periodically reviews accumulated memories across sessio
 
 Guard: not a subagent (`!toolUseContext.agentId`).
 
-## 3. User-Defined Stop Hooks (lines 175-332)
+## 3. User-Defined Stop Hooks (lines 175-332) `#resilience`
 
 After the background tasks are launched, `handleStopHooks()` runs user-configured stop hooks (`executeStopHooks`). These are shell commands the user has registered to run when the model stops.
 

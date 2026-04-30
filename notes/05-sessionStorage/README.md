@@ -105,14 +105,35 @@ Each message has an `isSidechain: boolean` flag. Sidechain messages are written 
 - **Session listing** — sidechain sessions are filtered OUT of `/resume` and session listings (`isSidechain` sessions are skipped during `enrichLogs`)
 - **Resume** — main session resumes from the last non-sidechain message (`findLatestMessage` filters `!m.isSidechain`)
 
-### Context inheritance is all-or-nothing
+### Context inheritance — two types of subagent (`AgentTool.tsx:630`, `runAgent.ts:370`)
 
-When a subagent is spawned, it either inherits **the entire parent conversation** or **nothing**:
+The key branch in `AgentTool.tsx`:
+```ts
+forkContextMessages: isForkPath ? toolUseContext.messages : undefined
+```
 
-- **Fork path** (e.g., coordinator workers): `forkContextMessages = toolUseContext.messages` — the full parent message history is cloned as the subagent's starting context. Incomplete tool calls are filtered out to avoid API errors.
-- **Normal path** (e.g., Explore, Plan agents): `forkContextMessages = undefined` — the subagent starts fresh with only a system prompt and the user's prompt message.
+This single flag determines which of two types the subagent is:
 
-There is no selective "pick these messages" logic. This is why the dedup bypass matters — fork-path subagents carry the full parent history with original UUIDs, and those must all be written to the sidechain file.
+| Type | `forkContextMessages` | Gets parent history? | Example |
+|------|-----------------------|----------------------|---------|
+| **Fork** | `toolUseContext.messages` | Yes — full parent history | coordinator workers |
+| **Fresh agent** | `undefined` | No — starts blank | Explore, Plan, AgentTool with `subagent_type` |
+
+**What a fork receives** (`runAgent.ts:370`):
+```ts
+contextMessages = filterIncompleteToolCalls(forkContextMessages)  // full parent history, minus incomplete tool calls
+initialMessages = [...contextMessages, ...promptMessages]          // parent history + new task prompt
+agentReadFileState = cloneFileStateCache(toolUseContext.readFileState)  // cloned file cache
+```
+
+**What a fresh agent receives:**
+```ts
+contextMessages = []                  // nothing from parent
+initialMessages = promptMessages      // just the task prompt
+agentReadFileState = fresh empty cache
+```
+
+It is all-or-nothing — there is no selective "pick these messages" logic. This is why the dedup bypass matters — fork-path subagents carry the full parent history with original UUIDs, and those must all be written to the sidechain file.
 
 ## Three-Layer Compaction Strategy
 
