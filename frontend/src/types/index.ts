@@ -46,7 +46,7 @@ export interface PanelDef {
   label: string
   contentKey?: string
   diagram?: PanelDiagram
-  animation?: 'async-generator' | 'transcript' | 'microcompact' | 'snip' | 'context-collapse' | 'autocompact' | 'flow-overview'
+  animation?: 'async-generator' | 'transcript' | 'microcompact' | 'snip' | 'context-collapse' | 'autocompact' | 'flow-overview' | 'per-tool' | 'streaming-executor' | 'concurrency-partition'
   layout?: 'split'
 }
 

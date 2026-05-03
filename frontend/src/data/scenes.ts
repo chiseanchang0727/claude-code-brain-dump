@@ -77,7 +77,7 @@ export const scenes: SceneDef[] = [
         label: 'Tools',
         sublabel: 'what the model can do',
         x: 10, y: 28,
-        description: 'Every available tool is described to the model — its name, what it does, and what inputs it accepts.',
+        detail: { contentKey: 'query-engine-detail/tools' },
       },
       {
         id: 'model-config',
@@ -258,7 +258,7 @@ export const scenes: SceneDef[] = [
         label: 'Tool Execution',
         sublabel: 'canUseTool() + runTools()',
         x: 84, y: 65,
-        detail: { contentKey: 'query-loop-detail/tool-exec' },
+        navigateTo: 'tool-execution-pipeline',
       },
       {
         id: 'post-tool',
@@ -340,6 +340,71 @@ export const scenes: SceneDef[] = [
       { from: 'snip', to: 'microcompact' },
       { from: 'microcompact', to: 'context-collapse' },
       { from: 'context-collapse', to: 'autocompact' },
+    ],
+  },
+
+  // ─────────────────────────────────────────────
+  // Scene — Tool Execution Pipeline (09-tools)
+  // ─────────────────────────────────────────────
+  {
+    id: 'tool-execution-pipeline',
+    title: 'Tool Execution Pipeline',
+    crumb: 'Tool Execution',
+    boxes: [
+      {
+        id: 'tool-blocks',
+        label: 'tool_use Blocks',
+        sublabel: 'from model response',
+        x: 50, y: 12,
+        description: 'When the model decides to use a tool, it returns one or more tool_use blocks in its response. Each block has a tool name, a unique ID, and the input the model wants to pass.',
+      },
+      {
+        id: 'streaming',
+        label: 'Streaming Executor',
+        sublabel: 'StreamingToolExecutor',
+        x: 26, y: 36,
+        variant: 'blue',
+        detail: { contentKey: 'tool-execution-pipeline/streaming', defaultPanel: 0 },
+      },
+      {
+        id: 'batch',
+        label: 'Batch Mode',
+        sublabel: 'runTools()',
+        x: 74, y: 36,
+        detail: { contentKey: 'tool-execution-pipeline/batch' },
+      },
+      {
+        id: 'partition',
+        label: 'Concurrency Partition',
+        sublabel: 'partitionToolCalls()',
+        x: 50, y: 60,
+        variant: 'amber',
+        detail: { contentKey: 'tool-execution-pipeline/partition', defaultPanel: 0 },
+      },
+      {
+        id: 'per-tool',
+        label: 'Per-Tool Pipeline',
+        sublabel: 'runToolUse() · 11 steps',
+        x: 50, y: 84,
+        variant: 'green',
+        detail: { contentKey: 'tool-execution-pipeline/per-tool', defaultPanel: 0 },
+      },
+    ],
+    arrows: [
+      { from: 'tool-blocks', to: 'streaming', label: 'streaming mode' },
+      { from: 'tool-blocks', to: 'batch',     label: 'batch mode' },
+      { from: 'streaming',   to: 'partition' },
+      { from: 'batch',       to: 'partition' },
+      { from: 'partition',   to: 'per-tool',  label: 'one call at a time' },
+      { from: 'per-tool', to: 'tool-blocks',  label: 'validation error → model retries', curved: true, dashed: true },
+    ],
+    regions: [
+      {
+        label: 'Execution Mode',
+        boxes: ['streaming', 'batch'],
+        padding: 24,
+        color: '#52525b',
+      },
     ],
   },
 ]

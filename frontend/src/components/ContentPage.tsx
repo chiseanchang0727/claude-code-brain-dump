@@ -10,6 +10,9 @@ import { MicrocompactAnimation } from './MicrocompactAnimation'
 import { SnipAnimation } from './SnipAnimation'
 import { ContextCollapseAnimation } from './ContextCollapseAnimation'
 import { AutocompactAnimation } from './AutocompactAnimation'
+import { PerToolAnimation } from './PerToolAnimation'
+import { StreamingExecutorAnimation } from './StreamingExecutorAnimation'
+import { ConcurrencyPartitionAnimation } from './ConcurrencyPartitionAnimation'
 import { theme } from '../theme'
 
 interface Props {
@@ -27,6 +30,9 @@ function PanelContent({ animation }: { animation?: string }) {
   if (animation === 'snip') return <SnipAnimation />
   if (animation === 'context-collapse') return <ContextCollapseAnimation />
   if (animation === 'autocompact') return <AutocompactAnimation />
+  if (animation === 'per-tool') return <PerToolAnimation />
+  if (animation === 'streaming-executor') return <StreamingExecutorAnimation />
+  if (animation === 'concurrency-partition') return <ConcurrencyPartitionAnimation />
   return null
 }
 

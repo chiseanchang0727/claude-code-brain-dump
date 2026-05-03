@@ -16,4 +16,13 @@ export const contentPanels: Record<string, PanelDef[]> = {
   'compaction-pipeline/autocompact': [
     { label: 'Illustration', animation: 'autocompact', layout: 'split' },
   ],
+  'tool-execution-pipeline/per-tool': [
+    { label: 'Illustration', animation: 'per-tool', layout: 'split' },
+  ],
+  'tool-execution-pipeline/streaming': [
+    { label: 'Illustration', animation: 'streaming-executor', layout: 'split' },
+  ],
+  'tool-execution-pipeline/partition': [
+    { label: 'Illustration', animation: 'concurrency-partition', layout: 'split' },
+  ],
 }

@@ -1,6 +1,11 @@
 # ValidateInput and the Self-Correction Loop `#resilience`
 
-Reference: [`src/services/tools/toolExecution.ts`](../../src/services/tools/toolExecution.ts) — `checkPermissionsAndCallTool`, steps 3–4
+Reference: [`src/services/tools/toolExecution.ts`](../../src/services/tools/toolExecution.ts)
+
+- `checkPermissionsAndCallTool` — line 599
+- Zod validation (step 3) — lines 615–680
+- `validateInput` call (step 4) — lines 683–733
+- `buildSchemaNotSentHint` (deferred tool hint) — lines 578–595
 
 ## Big Picture
 
@@ -10,16 +15,18 @@ When a tool call fails validation, there's no special retry mechanism — no loo
 
 Step 3 and step 4 of the per-tool pipeline are distinct:
 
-| Step | What it checks | On failure |
-|------|---------------|-----------|
-| **3 — Zod schema** | Type correctness (string vs array, missing required fields) | Returns `InputValidationError: ...` to model |
-| **4 — `validateInput()`** | Semantic correctness (does `old_string` actually appear in the file?) | Returns a descriptive error to model |
+| Step | What it checks | On failure | Lines |
+|------|---------------|-----------|-------|
+| **3 — Zod schema** | Type correctness (string vs array, missing required fields) | Returns `InputValidationError: ...` to model | 615–680 |
+| **4 — `validateInput()`** | Semantic correctness (does `old_string` actually appear in the file?) | Returns a descriptive error to model | 683–733 |
 
 Both return results to the model; neither throws an exception into the query loop. The model is the one that retries.
 
+Note that Zod validation is like Pydantic in python
+
 ## Why the Error Tag Matters
 
-When Zod validation fails, the error is returned tagged with a specific prefix:
+When Zod validation fails, the error is returned tagged with a specific prefix (line 670):
 
 ```
 <tool_use_error>InputValidationError: expected array, got string</tool_use_error>
@@ -70,16 +77,16 @@ No special retry loop. The correction happens through the same mechanism as ever
 
 ## The Key Insight: Error as Context
 
-The authors' note: *"the model is not great at generating valid input"* — this is a direct acknowledgement that Zod validation is a genuine necessity, not defensive code. Type mistakes (sending a string where an array is expected) genuinely happen in practice.
+The authors' note at line 614: *"the model is not great at generating valid input"* — this is a direct acknowledgement that Zod validation is a genuine necessity, not defensive code. Type mistakes (sending a string where an array is expected) genuinely happen in practice.
 
 The solution doesn't try to prevent these errors — it makes recovering from them trivially cheap. A well-tagged error message with enough context is all the model needs. The query loop handles it; the tool execution pipeline doesn't need to know a retry is happening.
 
 ## Deferred Tool Hint
 
-If a deferred tool fails at Zod validation because its schema was never sent to the API, the error appends an extra hint:
+If a deferred tool fails at Zod validation because its schema was never sent to the API, `buildSchemaNotSentHint` (line 578) appends an extra hint (line 595), which gets concatenated into the error at line 629:
 
 ```
-InputValidationError: ... Load the tool first via ToolSearch, then retry.
+InputValidationError: ... Load the tool first: call ToolSearch with query "select:<name>", then retry this call.
 ```
 
 Same pattern: the hint is embedded in the error message, the model reads it, the query loop handles it.
