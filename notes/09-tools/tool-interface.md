@@ -84,7 +84,10 @@ To keep Claude's model in sync: `inputsEquivalent()` compares Claude's original 
 
 ## Feature Gating
 
-Many tools are conditionally included via `feature()` flags or `process.env` checks at module load time (dead code elimination via `bun:bundle`). Examples:
-- `REPL_ONLY_TOOLS` are hidden when REPL mode is active (the REPL wraps primitives)
-- Coordinator-mode tools (`TaskStop`, `SendMessage`) only appear in coordinator builds
-- `ToolSearchTool` only included when tool search is optimistically enabled
+Not every tool in the source is available to every user. The active tool set is determined at two points:
+
+**Session start (runtime):** `getAllBaseTools()` checks environment variables and feature flags to build the pool. Tools excluded here are simply absent from the list sent to the model — it doesn't know they exist. Example: `ToolSearchTool` is only added when the feature flag is on (line 249, `src/tools.ts`).
+
+**Build time (compile-time):** Some tools are removed entirely from the binary before it ships. The public npm release is built with certain flags off — so those tools have zero footprint in what users download. No env var or config can enable them; the code isn't there.
+
+**What this means as an external user:** if a tool isn't responding or isn't visible, it may simply not be in your build. The tools guaranteed available are the core ones: `Bash`, `Read`, `Edit`, `Write`, `Agent`, and the standard file/search tools. Anything beyond that depends on which features Anthropic has enabled in that release.

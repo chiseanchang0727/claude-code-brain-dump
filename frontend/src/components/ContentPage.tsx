@@ -13,6 +13,10 @@ import { AutocompactAnimation } from './AutocompactAnimation'
 import { PerToolAnimation } from './PerToolAnimation'
 import { StreamingExecutorAnimation } from './StreamingExecutorAnimation'
 import { ConcurrencyPartitionAnimation } from './ConcurrencyPartitionAnimation'
+import { ToolsAnimation } from './ToolsAnimation'
+import { UnderstandAnimation } from './UnderstandAnimation'
+import { ExtractionAnimation } from './ExtractionAnimation'
+import { PrefetchAnimation } from './PrefetchAnimation'
 import { theme } from '../theme'
 
 interface Props {
@@ -33,6 +37,10 @@ function PanelContent({ animation }: { animation?: string }) {
   if (animation === 'per-tool') return <PerToolAnimation />
   if (animation === 'streaming-executor') return <StreamingExecutorAnimation />
   if (animation === 'concurrency-partition') return <ConcurrencyPartitionAnimation />
+  if (animation === 'tools') return <ToolsAnimation />
+  if (animation === 'understand') return <UnderstandAnimation />
+  if (animation === 'extraction') return <ExtractionAnimation />
+  if (animation === 'prefetch')   return <PrefetchAnimation />
   return null
 }
 

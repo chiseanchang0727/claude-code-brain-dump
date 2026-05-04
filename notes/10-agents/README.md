@@ -8,4 +8,4 @@ A subagent is a full recursive query loop — its own system prompt, message his
 
 ## Contents
 
-- [agent-tool.md](./agent-tool.md) — `AgentTool` entry point: fork vs named agent, sync/async decision, isolation modes, context inheritance via `createSubagentContext`
+- [agent-tool.md](./agent-tool.md) — `AgentTool` entry point: fork vs named agent, sync/async decision, isolation modes, context inheritance via `createSubagentContext`, full agent type catalogue

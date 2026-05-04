@@ -19,6 +19,18 @@ export const contentPanels: Record<string, PanelDef[]> = {
   'tool-execution-pipeline/per-tool': [
     { label: 'Illustration', animation: 'per-tool', layout: 'split' },
   ],
+  'memory-system/extraction': [
+    { label: 'Illustration', animation: 'extraction', layout: 'split' },
+  ],
+  'memory-system/prefetch': [
+    { label: 'Illustration', animation: 'prefetch', layout: 'split' },
+  ],
+  'query-engine-detail/understand': [
+    { label: 'Illustration', animation: 'understand', layout: 'split' },
+  ],
+  'query-engine-detail/tools': [
+    { label: 'Illustration', animation: 'tools', layout: 'split' },
+  ],
   'tool-execution-pipeline/streaming': [
     { label: 'Illustration', animation: 'streaming-executor', layout: 'split' },
   ],

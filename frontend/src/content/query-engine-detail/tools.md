@@ -44,7 +44,9 @@ assembleToolPool(ctx, mcpTools)  ← merges built-ins + MCP tools
 
 `filterToolsByDenyRules` strips blanket-denied tools from the prompt entirely — they're not just blocked at call time, the model never even sees them.
 
-## Feature gating
+## Additional Information
+
+### Feature gating
 
 Many tools are conditionally included via feature flags or `process.env` checks at module load time. Examples:
 - `REPL_ONLY_TOOLS` hidden when REPL mode is active

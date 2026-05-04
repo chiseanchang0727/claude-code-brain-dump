@@ -6,6 +6,7 @@ The memory system has two sides: reading relevant memories into context, and ext
 
 - [prefetch.md](./prefetch.md) — Read side: how relevant memories are selected and injected (Sonnet side query)
 - [extraction.md](./extraction.md) — Write side: how memories are automatically created (forked agent + direct writes)
+- [session-memory.md](./session-memory.md) — Per-session running notes file: trigger conditions, extraction agent, compaction integration
 - Prefetch uses **sideQuery** (single API call), extraction uses **forkedAgent** (full query loop). See [08-backgroundCalls](../08-backgroundCalls/README.md) for details.
 
 ## Lifecycle

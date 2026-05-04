@@ -27,7 +27,6 @@ function toolCard(
   doneBatches: number[],
 ) {
   const showLabel  = PHASES.indexOf(phase) >= PHASES.indexOf('label')
-  const showGroup  = PHASES.indexOf(phase) >= PHASES.indexOf('group')
   const isRunning  = activeBatch === tool.batch
   const isDone     = doneBatches.includes(tool.batch)
   const isInactive = activeBatch !== null && !isRunning && !isDone

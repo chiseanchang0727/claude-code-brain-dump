@@ -77,7 +77,7 @@ export const scenes: SceneDef[] = [
         label: 'Tools',
         sublabel: 'what the model can do',
         x: 10, y: 28,
-        detail: { contentKey: 'query-engine-detail/tools' },
+        detail: { contentKey: 'query-engine-detail/tools', defaultPanel: 0 },
       },
       {
         id: 'model-config',
@@ -114,7 +114,7 @@ export const scenes: SceneDef[] = [
         sublabel: 'parse the message',
         x: 48, y: 48,
         variant: 'amber',
-        description: 'Reads what the user sent. Handles special /commands locally if needed. Decides whether a real AI call is necessary at all.',
+        detail: { contentKey: 'query-engine-detail/understand', defaultPanel: 0 },
       },
       {
         id: 'save',
@@ -254,6 +254,14 @@ export const scenes: SceneDef[] = [
         detail: { contentKey: 'query-loop-detail/stop-hooks' },
       },
       {
+        id: 'memory',
+        label: 'Memory',
+        sublabel: 'extraction at 7b',
+        x: 16, y: 85,
+        variant: 'amber',
+        navigateTo: 'memory-system',
+      },
+      {
         id: 'tool-exec',
         label: 'Tool Execution',
         sublabel: 'canUseTool() + runTools()',
@@ -274,14 +282,24 @@ export const scenes: SceneDef[] = [
         x: 12, y: 65,
         detail: { contentKey: 'query-loop-detail/next-turn' },
       },
+      {
+        id: 'subagents',
+        label: 'AgentTool',
+        sublabel: 'subagent spawning',
+        x: 84, y: 85,
+        variant: 'green',
+        navigateTo: 'agent-tool',
+      },
     ],
     arrows: [
       { from: 'entry', to: 'preprocess' },
       { from: 'preprocess', to: 'api-stream' },
       { from: 'api-stream', to: 'decision', label: 'stream done' },
       { from: 'decision', to: 'stop-hooks', label: 'no tools' },
+      { from: 'stop-hooks', to: 'memory', label: 'fires at 7b', dashed: true },
       { from: 'decision', to: 'tool-exec', label: 'tools called' },
       { from: 'tool-exec', to: 'post-tool' },
+      { from: 'tool-exec', to: 'subagents', label: 'if AgentTool', dashed: true },
       { from: 'post-tool', to: 'next-turn' },
       { from: 'next-turn', to: 'entry', label: 'loop back', curved: true, dashed: true },
     ],
@@ -340,6 +358,133 @@ export const scenes: SceneDef[] = [
       { from: 'snip', to: 'microcompact' },
       { from: 'microcompact', to: 'context-collapse' },
       { from: 'context-collapse', to: 'autocompact' },
+    ],
+  },
+
+  // ─────────────────────────────────────────────
+  // Scene — Memory System (07-memory)
+  // ─────────────────────────────────────────────
+  {
+    id: 'memory-system',
+    title: 'Memory System',
+    crumb: 'Memory',
+    boxes: [
+      {
+        id: 'extraction',
+        label: 'Extraction',
+        sublabel: 'write side · stop hooks',
+        x: 18, y: 35,
+        variant: 'amber',
+        detail: { contentKey: 'memory-system/extraction', defaultPanel: 0 },
+      },
+      {
+        id: 'memory-files',
+        label: 'Memory Files',
+        sublabel: '~/.claude/.../memory/',
+        x: 50, y: 35,
+        detail: { contentKey: 'memory-system/memory-files' },
+      },
+      {
+        id: 'prefetch',
+        label: 'Prefetch',
+        sublabel: 'read side · Sonnet selects',
+        x: 82, y: 35,
+        variant: 'blue',
+        detail: { contentKey: 'memory-system/prefetch', defaultPanel: 0 },
+      },
+      {
+        id: 'session-memory',
+        label: 'Session Memory',
+        sublabel: 'per-session · feeds compaction',
+        x: 50, y: 75,
+        variant: 'ghost',
+        detail: { contentKey: 'memory-system/session-memory' },
+      },
+    ],
+    arrows: [
+      { from: 'extraction',    to: 'memory-files', label: 'writes' },
+      { from: 'memory-files',  to: 'prefetch',     label: 'reads' },
+    ],
+    regions: [
+      {
+        label: 'Long-term Memory',
+        boxes: ['extraction', 'memory-files', 'prefetch'],
+        padding: 32,
+        color: '#52525b',
+        labelAlign: 'center',
+      },
+    ],
+  },
+
+  // ─────────────────────────────────────────────
+  // Scene — AgentTool (10-agents)
+  // ─────────────────────────────────────────────
+  {
+    id: 'agent-tool',
+    title: 'AgentTool — Subagent Architecture',
+    crumb: 'AgentTool',
+    boxes: [
+      {
+        id: 'entry',
+        label: 'AgentTool',
+        sublabel: 'call() decision tree',
+        x: 50, y: 8,
+        description: 'AgentTool is the single entry point for all subagent spawning. Its call() runs a decision tree that determines agent type, sync/async mode, and isolation.',
+      },
+      {
+        id: 'fork',
+        label: 'Fork Path',
+        sublabel: 'inherits parent history',
+        x: 24, y: 32,
+        variant: 'blue',
+        detail: { contentKey: 'agent-tool/fork' },
+      },
+      {
+        id: 'named',
+        label: 'Named Agent',
+        sublabel: 'AgentDefinition loaded',
+        x: 76, y: 32,
+        variant: 'green',
+        detail: { contentKey: 'agent-tool/named' },
+      },
+      {
+        id: 'sync-async',
+        label: 'Sync vs Async',
+        sublabel: 'shouldRunAsync decision',
+        x: 50, y: 56,
+        variant: 'amber',
+        detail: { contentKey: 'agent-tool/sync-async' },
+      },
+      {
+        id: 'isolation',
+        label: 'Isolation Mode',
+        sublabel: 'default · worktree · remote',
+        x: 24, y: 80,
+        detail: { contentKey: 'agent-tool/isolation' },
+      },
+      {
+        id: 'context',
+        label: 'Context Inheritance',
+        sublabel: 'createSubagentContext()',
+        x: 76, y: 80,
+        detail: { contentKey: 'agent-tool/context' },
+      },
+    ],
+    arrows: [
+      { from: 'entry',     to: 'fork',      label: 'no subagent_type' },
+      { from: 'entry',     to: 'named',     label: 'subagent_type set' },
+      { from: 'fork',      to: 'sync-async' },
+      { from: 'named',     to: 'sync-async' },
+      { from: 'sync-async', to: 'isolation' },
+      { from: 'sync-async', to: 'context' },
+    ],
+    regions: [
+      {
+        label: 'Agent Type',
+        boxes: ['fork', 'named'],
+        padding: 24,
+        color: '#52525b',
+      },
     ],
   },
 
@@ -405,6 +550,72 @@ export const scenes: SceneDef[] = [
         padding: 24,
         color: '#52525b',
       },
+    ],
+  },
+
+  // ─────────────────────────────────────────────
+  // Scene — Home / Navigation Hub
+  // ─────────────────────────────────────────────
+  {
+    id: 'home',
+    title: 'Claude Code — Internals',
+    crumb: 'Home',
+    boxes: [
+      {
+        id: 'nav-arch',
+        label: 'Architecture Flow',
+        sublabel: 'CLI → QueryEngine → result',
+        x: 50, y: 14,
+        navigateTo: 'architecture-flow',
+      },
+      {
+        id: 'nav-qe',
+        label: 'QueryEngine',
+        sublabel: 'per-turn orchestration',
+        x: 26, y: 42,
+        variant: 'amber',
+        navigateTo: 'query-engine-detail',
+      },
+      {
+        id: 'nav-ql',
+        label: 'Query Loop',
+        sublabel: 'query.ts · while(true)',
+        x: 74, y: 42,
+        variant: 'amber',
+        navigateTo: 'query-loop-detail',
+      },
+      {
+        id: 'nav-compact',
+        label: 'Compaction',
+        sublabel: 'message pre-processing',
+        x: 20, y: 74,
+        variant: 'yellow',
+        navigateTo: 'compaction-pipeline',
+      },
+      {
+        id: 'nav-tools',
+        label: 'Tool Execution',
+        sublabel: 'runTools() pipeline',
+        x: 50, y: 74,
+        variant: 'blue',
+        navigateTo: 'tool-execution-pipeline',
+      },
+      {
+        id: 'nav-agent',
+        label: 'AgentTool',
+        sublabel: 'subagent spawning',
+        x: 80, y: 74,
+        variant: 'green',
+        navigateTo: 'agent-tool',
+      },
+    ],
+    arrows: [
+      { from: 'nav-arch',    to: 'nav-qe' },
+      { from: 'nav-arch',    to: 'nav-ql' },
+      { from: 'nav-qe',      to: 'nav-ql' },
+      { from: 'nav-ql',      to: 'nav-compact', label: 'pre-process' },
+      { from: 'nav-ql',      to: 'nav-tools',   label: 'tool calls' },
+      { from: 'nav-tools',   to: 'nav-agent',   label: 'AgentTool' },
     ],
   },
 ]
