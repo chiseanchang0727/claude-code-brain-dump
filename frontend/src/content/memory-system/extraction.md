@@ -10,23 +10,9 @@ When the user says "remember this", the main agent (Opus) follows system prompt 
 
 ## Path 2 — Auto-extraction (background)
 
-Fires at **stop hook 7b** — after the model stops calling tools, before the loop returns. Invisible to the user.
+Runs automatically after every model response, invisible to the user. A background agent wakes up, reviews the recent conversation, and writes any durable facts it finds to the memory directory.
 
-```
-query loop ends
-      ↓
-stop hook 7b fires
-      ↓
-runForkedAgent()          ← shares parent's prompt cache (cheap)
-  allowed tools:
-    Read, Grep, Glob      ← unrestricted
-    Bash                  ← read-only commands only
-    Edit, Write           ← memory directory only
-      ↓
-extracts durable memories from last N messages
-      ↓
-injects "memory saved" notice into main conversation
-```
+The background agent runs with a restricted tool set — it can read anything but can only write to the memory directory. It reuses the parent conversation's cached context, so the API call is cheap. After it finishes, a "memory saved" notice is injected into the main conversation so the model knows what was captured.
 
 ## Mutual exclusion
 
