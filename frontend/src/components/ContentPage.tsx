@@ -17,6 +17,10 @@ import { ToolsAnimation } from './ToolsAnimation'
 import { UnderstandAnimation } from './UnderstandAnimation'
 import { ExtractionAnimation } from './ExtractionAnimation'
 import { PrefetchAnimation } from './PrefetchAnimation'
+import { CacheAnimation } from './CacheAnimation'
+import { ApiStreamAnimation } from './ApiStreamAnimation'
+import { StopHooksAnimation } from './StopHooksAnimation'
+import { ContextInheritanceAnimation } from './ContextInheritanceAnimation'
 import { theme } from '../theme'
 
 interface Props {
@@ -41,6 +45,10 @@ function PanelContent({ animation }: { animation?: string }) {
   if (animation === 'understand') return <UnderstandAnimation />
   if (animation === 'extraction') return <ExtractionAnimation />
   if (animation === 'prefetch')   return <PrefetchAnimation />
+  if (animation === 'cache')      return <CacheAnimation />
+  if (animation === 'api-stream') return <ApiStreamAnimation />
+  if (animation === 'stop-hooks') return <StopHooksAnimation />
+  if (animation === 'context-inheritance') return <ContextInheritanceAnimation />
   return null
 }
 

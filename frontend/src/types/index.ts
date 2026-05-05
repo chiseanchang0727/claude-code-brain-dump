@@ -46,7 +46,7 @@ export interface PanelDef {
   label: string
   contentKey?: string
   diagram?: PanelDiagram
-  animation?: 'async-generator' | 'transcript' | 'microcompact' | 'snip' | 'context-collapse' | 'autocompact' | 'flow-overview' | 'per-tool' | 'streaming-executor' | 'concurrency-partition' | 'tools' | 'understand' | 'extraction' | 'prefetch'
+  animation?: 'async-generator' | 'transcript' | 'microcompact' | 'snip' | 'context-collapse' | 'autocompact' | 'flow-overview' | 'per-tool' | 'streaming-executor' | 'concurrency-partition' | 'tools' | 'understand' | 'extraction' | 'prefetch' | 'cache' | 'api-stream' | 'stop-hooks' | 'context-inheritance' | 'agent-tool-flow'
   layout?: 'split'
 }
 
@@ -59,6 +59,7 @@ export interface SceneDef {
   regions?: RegionDef[]
   panels?: PanelDef[]
   hideDiagramTab?: boolean  // hides the Diagram tab; diagram code is preserved
+  sideSteps?: { text: string; y: number; fromBoxId?: string }[]  // step boxes pinned at y% alongside the diagram
 }
 
 export type HistoryItem =

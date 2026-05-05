@@ -2,6 +2,39 @@
 
 Reference: [src/utils/forkedAgent.ts](../../src/utils/forkedAgent.ts) (lines 46-68), [src/services/api/claude.ts](../../src/services/api/claude.ts) (`addCacheBreakpoints`, `getCacheControl`)
 
+## How the Cache Grows Turn by Turn `#prompt-cache` `#cost-management`
+
+The cache doesn't stay fixed — it grows with each turn. The key insight is that the cache is **prefix-based**: if the start of your current API call matches a previously cached prefix, those tokens are a cache hit.
+
+`addCacheBreakpoints()` (`src/services/api/claude.ts` line 3063) places **one** `cache_control` marker on the last message of every API call (line 3089: `markerIndex = messages.length - 1`).
+
+```
+Turn 1 API call:  [sys, tools, msg1, msg2*]      (* = cache_control marker)
+                   └───────────────────────┘
+                         cache WRITTEN here
+
+Turn 2 API call:  [sys, tools, msg1, msg2, msg3, msg4*]
+                   └────────────────────┘  └──────────┘
+                       cache HIT (0.1x)     full price
+                                                 ↑
+                                        new cache WRITTEN here
+
+Turn 3 API call:  [sys, tools, msg1, msg2, msg3, msg4, msg5, msg6*]
+                   └──────────────────────────────────┘  └────────┘
+                              cache HIT (0.1x)             full price
+```
+
+Each turn you pay:
+- **0.1x** for everything from previous turns (cache read on the old prefix)
+- **Full price** only for the new messages added this turn
+- **Cache write** to extend the cache marker to the new tail
+
+The conversation history grows, but the cost per turn only scales with the **delta** — the new messages — not the full accumulated context.
+
+**Why only one marker?** Mycro (Anthropic's internal cache system) frees KV pages at positions not protected by a cache marker. Two markers would protect an intermediate position unnecessarily, wasting memory. One marker at the tail is the right choice — the old prefix is still a cache hit, and only the new tail needs to be written.
+
+---
+
 ## The Problem
 
 Every API call to Claude processes the full message history (system prompt + tools + messages). For a long conversation, this means re-processing hundreds of thousands of tokens per call. When a forked agent (memory extraction, compaction, etc.) starts a new query loop, it would pay the full input token cost again — even though its context is nearly identical to the parent's.

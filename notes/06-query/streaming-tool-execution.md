@@ -8,6 +8,21 @@ Normally: model streams full response → THEN tools execute. With `StreamingToo
 
 Feature-gated behind `config.gates.streamingToolExecution`.
 
+## Per-Message Loop (`query.ts:658–864`)
+
+For every message the model streams back, the loop does:
+
+```
+receive message
+  → maybe clone for SDK (backfillObservableInput, keeps original for API)
+  → maybe withhold (prompt_too_long, media errors — held pending recovery)
+  → yield to caller
+  → if tool_use block: addTool() → starts executing immediately
+  → poll getCompletedResults() → yield any tools that already finished
+```
+
+The whole point is **maximum parallelism** — tools run while the model is still talking.
+
 ## How It Works
 
 1. **During streaming** (step 3 in execution flow) — each time a `tool_use` block arrives, it's fed to `addTool()` immediately

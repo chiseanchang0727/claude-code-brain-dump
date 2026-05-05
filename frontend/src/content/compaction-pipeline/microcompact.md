@@ -10,7 +10,7 @@ Clears old tool result content by replacing it with a placeholder. Does **not** 
 
 Fires when the gap since the last assistant message exceeds `gapThresholdMinutes` (from config).
 
-**Reasoning:** if the prompt cache TTL (~5 min) has expired, the full prefix will be rewritten on the next API call anyway — clearing old results now shrinks what gets rewritten.
+**Reasoning:** if the prompt cache TTL(Time-To-Live) (~5 min) has expired, the full prefix will be rewritten on the next API call anyway — clearing old results now shrinks what gets rewritten.
 
 - Keeps `keepRecent` most recent tool results
 - Clears the rest

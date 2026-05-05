@@ -108,6 +108,7 @@ QueryEngine.submitMessage()   (QueryEngine.ts:209)
 
 - [query-state.md](./query-state.md) — mutable loop state, `State` struct, `continue` pattern
 - [compaction-strategies.md](./compaction-strategies.md) — snip / microcompact / context collapse / autocompact: what each does, trigger conditions, order
+- [compaction-deep-dive.md](./compaction-deep-dive.md) — how compactConversation works: session memory path vs API path, post-compact rebuild, token thresholds, circuit breaker
 - [streaming-result-handling.md](./streaming-result-handling.md) — every condition checked on streaming output: per-message (tombstone, withhold, tool_use, poll) and post-stream (fallback, abort, 413 recovery)
 - [execution-flow.md](./execution-flow.md) — detailed 12-step execution flow with state machine diagrams
 - [async-prefetch.md](./async-prefetch.md) — start async work early, consume when ready

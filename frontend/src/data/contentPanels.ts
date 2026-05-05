@@ -19,6 +19,18 @@ export const contentPanels: Record<string, PanelDef[]> = {
   'tool-execution-pipeline/per-tool': [
     { label: 'Illustration', animation: 'per-tool', layout: 'split' },
   ],
+  'query-loop-detail/api-stream': [
+    { label: 'Illustration', animation: 'api-stream', layout: 'split' },
+  ],
+  'query-loop-detail/stop-hooks': [
+    { label: 'Illustration', animation: 'stop-hooks', layout: 'split' },
+  ],
+  'agent-tool/context': [
+    { label: 'Illustration', animation: 'context-inheritance' },
+  ],
+  'background-calls/cache': [
+    { label: 'Illustration', animation: 'cache', layout: 'split' },
+  ],
   'memory-system/extraction': [
     { label: 'Illustration', animation: 'extraction', layout: 'split' },
   ],

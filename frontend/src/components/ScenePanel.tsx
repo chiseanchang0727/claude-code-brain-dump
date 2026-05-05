@@ -7,6 +7,7 @@ import { DiagramCanvas } from './DiagramCanvas'
 import { AsyncGeneratorAnimation } from './AsyncGeneratorAnimation'
 import { TranscriptAnimation } from './TranscriptAnimation'
 import { FlowOverviewPanel } from './FlowOverviewPanel'
+import { AgentToolAnimation } from './AgentToolAnimation'
 
 interface Props {
   panel: PanelDef
@@ -22,6 +23,8 @@ export function ScenePanel({ panel, onNavigateScene, onOpenContent }: Props) {
 
   if (panel.animation === 'flow-overview')
     return <FlowOverviewPanel onNavigateScene={onNavigateScene} onOpenContent={onOpenContent} />
+  if (panel.animation === 'agent-tool-flow')
+    return <AgentToolAnimation />
 
   if (!panel.animation && !panel.diagram && !parsed)
     return <p className="text-zinc-500 p-8">Content not found: {panel.contentKey}</p>

@@ -1,5 +1,6 @@
 import { useRef, useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
+import ReactMarkdown from 'react-markdown'
 import type { SceneDef, BoxDef } from '../types'
 import { Box } from './Box'
 import { Arrow } from './Arrow'
@@ -116,6 +117,58 @@ export function Scene({ scene, direction, editMode, onNavigateScene, onOpenConte
       <div className="relative flex-1 overflow-hidden">
         {activePanel !== null && scene.panels ? (
           <ScenePanel panel={scene.panels[activePanel]} onNavigateScene={onNavigateScene} onOpenContent={onOpenContent} />
+        ) : scene.sideSteps ? (
+          <div className="absolute inset-0 flex">
+            <div ref={containerRef} className="relative flex-1 h-full" onClick={() => { if (!editMode) setBubbleId(null) }}>
+              {effectiveBoxes.filter(b => !b.elevated).map(box => (
+                <Box key={box.id} box={box} editMode={editMode} bubbleOpen={bubbleId === box.id}
+                  onToggleBubble={() => setBubbleId(bubbleId === box.id ? null : box.id)}
+                  onNavigateScene={onNavigateScene} onOpenContent={onOpenContent} onDragEnd={handleDragEnd} />
+              ))}
+              <svg className="absolute inset-0 w-full h-full pointer-events-none overflow-visible">
+                {scene.regions?.map(region => (
+                  <Region key={region.label} region={region} boxes={effectiveBoxes} containerSize={size} />
+                ))}
+                {scene.arrows.map(arrow => (
+                  <Arrow key={`${arrow.from}-${arrow.to}`} arrow={arrow} boxes={effectiveBoxes} containerSize={size} />
+                ))}
+                {scene.sideSteps?.filter(s => s.fromBoxId).map((step, i) => {
+                  const box = effectiveBoxes.find(b => b.id === step.fromBoxId)
+                  if (!box || !size.width || !size.height) return null
+                  const x1 = size.width * (box.x / 100) + 83
+                  const y  = size.height * (step.y / 100)
+                  return <line key={i} x1={x1} y1={y} x2={size.width} y2={y}
+                    stroke="#3f3f46" strokeWidth="1" strokeDasharray="4 4" />
+                })}
+              </svg>
+              {effectiveBoxes.filter(b => b.elevated).map(box => (
+                <Box key={box.id} box={box} editMode={editMode} bubbleOpen={bubbleId === box.id}
+                  onToggleBubble={() => setBubbleId(bubbleId === box.id ? null : box.id)}
+                  onNavigateScene={onNavigateScene} onOpenContent={onOpenContent} onDragEnd={handleDragEnd} />
+              ))}
+            </div>
+            <div className="w-80 border-l border-zinc-800 relative shrink-0">
+              {scene.sideSteps.map((step, i) => (
+                <div key={i} className="absolute left-0 right-2 -translate-y-1/2 flex items-center" style={{ top: `${step.y}%` }}>
+                  <div className="w-8 shrink-0 border-t border-dashed border-zinc-600" />
+                  <div className="flex-1 rounded-lg border border-zinc-700 bg-zinc-900 px-4 py-3 flex items-start gap-3">
+                    <span className="text-xs font-mono text-zinc-600 shrink-0 mt-0.5">{i + 1}</span>
+                    <div className="text-sm text-zinc-300 min-w-0">
+                      <ReactMarkdown components={{
+                        p:      ({ children }) => <p className="text-sm text-zinc-300">{children}</p>,
+                        ul:     ({ children }) => <ul className="mt-1 space-y-0.5 list-disc list-inside">{children}</ul>,
+                        li:     ({ children }) => <li className="text-xs text-zinc-400">{children}</li>,
+                        strong: ({ children }) => <strong className="text-zinc-200 font-semibold">{children}</strong>,
+                        code:   ({ children }) => <code className="text-xs bg-zinc-800 text-zinc-300 px-1 rounded">{children}</code>,
+                      }}>
+                        {step.text}
+                      </ReactMarkdown>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         ) : (
           <div
             ref={containerRef}
