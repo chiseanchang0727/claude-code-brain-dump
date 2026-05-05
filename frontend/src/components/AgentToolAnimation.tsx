@@ -14,7 +14,7 @@ function getScenario(phase: string): Scenario {
 
 const MOCK_MESSAGES = [
   { role: 'user',      text: 'read the config'        },
-  { role: 'assistant', text: 'checking…', tool: 'Read' },
+  { role: 'assistant', text: 'checking…'               },
   { role: 'user',      text: 'update timeout'          },
   { role: 'assistant', text: 'updating now'             },
 ]
@@ -27,6 +27,7 @@ export function AgentToolAnimation() {
   const showParent  = !['idle'].includes(phase)
   const showBranch  = scenario !== null
   const showInherit = ['fork-inherit', 'fork-run'].includes(phase)
+  const showAgentCall = !['idle', 'parent-convo'].includes(phase)
 
   return (
     <div key={cycle} className="h-full flex flex-col py-5 px-6 gap-4 max-w-2xl mx-auto w-full">
@@ -45,37 +46,10 @@ export function AgentToolAnimation() {
         ))}
       </div>
 
-      {/* Decision */}
-      <AnimatePresence>
-        {phase !== 'idle' && phase !== 'parent-convo' && (
-          <motion.div key="dec" initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-            className="shrink-0 flex items-center gap-2">
-            <div className="border border-zinc-700 rounded px-3 py-1 text-xs font-mono text-zinc-400 shrink-0">
-              subagent_type?
-            </div>
-            <div className="h-px flex-1 bg-zinc-700" />
-            <AnimatePresence mode="wait">
-              {scenario === 'fork' && (
-                <motion.span key="no" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                  className="text-xs font-mono text-blue-400 shrink-0">no → fork</motion.span>
-              )}
-              {scenario === 'named' && (
-                <motion.span key="yes" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                  className="text-xs font-mono text-green-400 shrink-0">yes → named</motion.span>
-              )}
-              {!scenario && (
-                <motion.span key="q" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                  className="text-xs font-mono text-zinc-600 shrink-0">…</motion.span>
-              )}
-            </AnimatePresence>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       {/* Main area: trunk + agent box + annotation */}
       <div className="flex-1 min-h-0 flex gap-3">
 
-        {/* Parent trunk — always visible */}
+        {/* Parent trunk */}
         <div className="shrink-0 flex flex-col" style={{ width: 120 }}>
           <AnimatePresence>
             {showParent && (
@@ -84,6 +58,8 @@ export function AgentToolAnimation() {
                 <div className="text-xs text-zinc-500 font-mono mb-2 pl-5">parent</div>
                 <div className="relative flex-1">
                   <div className="absolute left-[7px] top-0 bottom-0 w-px bg-zinc-700" />
+
+                  {/* Conversation messages */}
                   {MOCK_MESSAGES.map((m, i) => (
                     <motion.div key={i}
                       initial={{ opacity: 0 }} animate={{ opacity: 1 }}
@@ -99,11 +75,47 @@ export function AgentToolAnimation() {
                     </motion.div>
                   ))}
 
+                  {/* Agent tool call */}
+                  <AnimatePresence>
+                    {showAgentCall && (
+                      <motion.div key="agent-call"
+                        initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                        className="flex items-start gap-2 mb-2">
+                        <div className="w-3.5 h-3.5 rounded-full border bg-green-950 border-green-700 shrink-0 z-10 relative mt-0.5" />
+                        <div>
+                          <div className="text-xs text-zinc-500 font-mono leading-tight">assistant</div>
+                          <AnimatePresence mode="wait">
+                            {scenario === 'fork' && (
+                              <motion.div key="fork-call" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                                className="mt-0.5 text-[11px] font-mono border border-blue-800 rounded px-1.5 py-0.5 text-blue-400 leading-tight">
+                                Agent()
+                              </motion.div>
+                            )}
+                            {scenario === 'named' && (
+                              <motion.div key="named-call" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                                className="mt-0.5 text-[11px] font-mono border border-green-800 rounded px-1.5 py-0.5 text-green-400 leading-tight">
+                                Agent(<br />
+                                &nbsp;subagent_type=…<br />
+                                )
+                              </motion.div>
+                            )}
+                            {!scenario && (
+                              <motion.div key="q-call" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                                className="mt-0.5 text-[11px] font-mono border border-zinc-700 rounded px-1.5 py-0.5 text-zinc-500 leading-tight">
+                                Agent(…)
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
                   {/* Branch point */}
                   <AnimatePresence>
                     {showBranch && (
                       <motion.div key="bp" initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                        className="flex items-center">
+                        className="flex items-center mt-1">
                         <div className={`w-3.5 h-3.5 rounded-full border shrink-0 z-10 relative ${
                           scenario === 'fork' ? 'bg-blue-900 border-blue-600' : 'bg-green-900 border-green-700'
                         }`} />
@@ -138,7 +150,6 @@ export function AgentToolAnimation() {
                 className="rounded-lg border border-blue-800 bg-blue-950/20 px-3 py-2.5 flex flex-col gap-2">
                 <div className="text-xs text-blue-400 font-mono">fork agent</div>
 
-                {/* Inherited messages */}
                 <AnimatePresence>
                   {showInherit && (
                     <motion.div key="msgs" initial={{ opacity: 0 }} animate={{ opacity: 1 }}
@@ -162,7 +173,6 @@ export function AgentToolAnimation() {
                   )}
                 </AnimatePresence>
 
-                {/* Waiting to inherit */}
                 <AnimatePresence>
                   {phase === 'fork-spawn' && (
                     <motion.div key="wait" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
@@ -170,7 +180,6 @@ export function AgentToolAnimation() {
                   )}
                 </AnimatePresence>
 
-                {/* Tools */}
                 <AnimatePresence>
                   {phase === 'fork-run' && (
                     <motion.div key="tools" initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }}
@@ -194,7 +203,6 @@ export function AgentToolAnimation() {
                 className="rounded-lg border border-green-800 bg-green-950/20 px-3 py-2.5 flex flex-col gap-2">
                 <div className="text-xs text-green-400 font-mono">named agent</div>
 
-                {/* No inheritance — empty messages */}
                 <div className="space-y-1.5">
                   {MOCK_MESSAGES.map((_, i) => (
                     <div key={i} className="flex items-center gap-1.5 opacity-20">
@@ -258,10 +266,10 @@ export function AgentToolAnimation() {
                 <p className="text-xs text-zinc-400 leading-snug">Called by the model. Includes <span className="font-mono text-zinc-300">subagent_type</span> in its AgentTool call to request a specific capability:</p>
                 <ul className="space-y-0.5">
                   {[
-                    { name: 'Explore',          desc: 'read-only codebase search' },
-                    { name: 'Plan',             desc: 'designs implementation plans' },
-                    { name: 'verification',     desc: 'runs builds/tests, PASS/FAIL' },
-                    { name: 'claude-code-guide',desc: 'answers Claude Code questions' },
+                    { name: 'Explore',           desc: 'read-only codebase search' },
+                    { name: 'Plan',              desc: 'designs implementation plans' },
+                    { name: 'verification',      desc: 'runs builds/tests, PASS/FAIL' },
+                    { name: 'claude-code-guide', desc: 'answers Claude Code questions' },
                   ].map(item => (
                     <li key={item.name} className="text-[11px] text-zinc-600 flex gap-1.5">
                       <span className="text-zinc-700 shrink-0">·</span>
