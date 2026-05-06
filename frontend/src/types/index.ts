@@ -46,7 +46,7 @@ export interface PanelDef {
   label: string
   contentKey?: string
   diagram?: PanelDiagram
-  animation?: 'async-generator' | 'transcript' | 'microcompact' | 'snip' | 'context-collapse' | 'autocompact' | 'flow-overview' | 'per-tool' | 'streaming-executor' | 'concurrency-partition' | 'tools' | 'understand' | 'extraction' | 'prefetch' | 'cache' | 'api-stream' | 'stop-hooks' | 'context-inheritance' | 'agent-tool-flow'
+  animation?: 'async-generator' | 'transcript' | 'microcompact' | 'snip' | 'context-collapse' | 'autocompact' | 'flow-overview' | 'per-tool' | 'streaming-executor' | 'concurrency-partition' | 'tools' | 'understand' | 'extraction' | 'prefetch' | 'cache' | 'api-stream' | 'stop-hooks' | 'context-inheritance' | 'agent-tool-flow' | 'system-prompt'
   layout?: 'split'
 }
 

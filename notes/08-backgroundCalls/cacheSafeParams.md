@@ -2,6 +2,100 @@
 
 Reference: [src/utils/forkedAgent.ts](../../src/utils/forkedAgent.ts) (lines 46-68), [src/services/api/claude.ts](../../src/services/api/claude.ts) (`addCacheBreakpoints`, `getCacheControl`)
 
+## Full Cache Structure Per API Call `#prompt-cache`
+
+Every API call has **three separate cache layers**, each with its own marker:
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  system prompt blocks       ← cache_control markers here │
+│    [attribution header]       (no marker — billing meta) │
+│    [static blocks*]           cache_control: global      │
+│    [dynamic blocks]           (no marker — per-session)  │
+│                                                          │
+│  tools array                ← marker here if MCP present │
+│    [built-in tools]                                      │
+│    [MCP tools]              cache_control: org           │
+│                                                          │
+│  messages                   ← one marker on last message │
+│    [msg1, msg2, ..., msgN]  cache_control: ephemeral     │
+└─────────────────────────────────────────────────────────┘
+```
+
+### System Prompt Cache (`buildSystemPromptBlocks`, `claude.ts:3213`; `splitSysPromptPrefix`, `api.ts:321`)
+
+The system prompt is split into blocks and each block gets a `cacheScope`:
+
+| Block | Scope | Cached? |
+|---|---|---|
+| Attribution / billing header | `null` | No |
+| CLI prefix (stable identity block) | `null` or `org` | Varies |
+| **Static blocks** (before `SYSTEM_PROMPT_DYNAMIC_BOUNDARY`) | `global` | Yes — shared across all users |
+| Dynamic blocks (after boundary — git status, memory, etc.) | `null` | No — per-session |
+
+The `global` scope is key: static parts of the system prompt (tool descriptions, base instructions) are cached at **global scope** — the same cache entry is shared across all Claude Code users. You don't pay to warm it yourself.
+
+**What is `SYSTEM_PROMPT_DYNAMIC_BOUNDARY`?** A sentinel string inserted into the system prompt (`constants/prompts.ts:573`) that separates the stable prefix from the per-session suffix. Everything before it can be globally cached; everything after changes per user/session.
+
+### Tool Schema Cache
+
+Built-in tools are sorted and placed before MCP tools (see `tool-interface.md`). The cache marker placement depends on whether MCP tools are present:
+
+**No MCP tools (normal case):**
+- System prompt static blocks get `cacheScope: 'global'` — shared across **all** Claude Code users worldwide. Anthropic pre-warms this; your first call of the day is already a cache hit.
+- Tool schemas have no marker — they fall inside the globally-cached prefix automatically.
+
+**MCP tools present (`needsToolBasedCacheMarker`, `claude.ts:1212`):**
+- System prompt blocks drop to `cacheScope: 'org'` — still cached, but only within your account. You lose the global warm-up; your first call of the session pays full price to create the cache entry.
+- Last built-in tool schema gets `cache_control: org` — the marker shifts here instead.
+- MCP tools are placed after the marker — they're per-user so they can't be org/globally cached.
+- Why the shift: MCP tools change per user. If the system prompt marker were used and an MCP tool changed, it would bust the entire prefix behind it. Putting the marker on the last stable built-in tool keeps the built-in block cacheable even when MCP tools change.
+
+### Example: Normal Session (No MCP)
+
+```
+API request:
+  system: [
+    { text: "...base instructions...", cache_control: { type: "ephemeral", scope: "global" } },
+    { text: "...git status, memory..." }   ← no marker, dynamic
+  ]
+  tools: [
+    { name: "Bash", ... },
+    { name: "Read", ... },
+    ...                                    ← no marker needed, inside cached prefix
+  ]
+  messages: [
+    { role: "user", content: "..." },
+    { role: "assistant", content: "..." },
+    { role: "user", content: "...", cache_control: { type: "ephemeral" } }  ← last message
+  ]
+```
+
+### Example: Session With MCP Tools
+
+```
+API request:
+  system: [
+    { text: "...base instructions...", cache_control: { type: "ephemeral", scope: "org" } },
+    { text: "...git status, memory..." }   ← no marker, dynamic
+  ]
+  tools: [
+    { name: "Bash", ... },
+    { name: "Read", ... },
+    { name: "WebFetch", ..., cache_control: { type: "ephemeral", scope: "org" } },  ← last built-in
+    { name: "mcp__github__search", ... },  ← MCP tools after marker, dynamic
+    { name: "mcp__slack__send", ... },
+  ]
+  messages: [
+    ...
+    { role: "user", content: "...", cache_control: { type: "ephemeral" } }  ← last message
+  ]
+```
+
+System prompt is cached at `org` scope (not global — you warm it yourself). Built-in tools before the MCP marker are stable → cache hit within your account. MCP suffix changes per user → not cached.
+
+---
+
 ## How the Cache Grows Turn by Turn `#prompt-cache` `#cost-management`
 
 The cache doesn't stay fixed — it grows with each turn. The key insight is that the cache is **prefix-based**: if the start of your current API call matches a previously cached prefix, those tokens are a cache hit.

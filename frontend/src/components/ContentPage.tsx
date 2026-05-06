@@ -21,6 +21,7 @@ import { CacheAnimation } from './CacheAnimation'
 import { ApiStreamAnimation } from './ApiStreamAnimation'
 import { StopHooksAnimation } from './StopHooksAnimation'
 import { ContextInheritanceAnimation } from './ContextInheritanceAnimation'
+import { SystemPromptAnimation } from './SystemPromptAnimation'
 import { theme } from '../theme'
 
 interface Props {
@@ -49,6 +50,7 @@ function PanelContent({ animation }: { animation?: string }) {
   if (animation === 'api-stream') return <ApiStreamAnimation />
   if (animation === 'stop-hooks') return <StopHooksAnimation />
   if (animation === 'context-inheritance') return <ContextInheritanceAnimation />
+  if (animation === 'system-prompt') return <SystemPromptAnimation />
   return null
 }
 

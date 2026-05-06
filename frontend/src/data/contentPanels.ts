@@ -28,6 +28,9 @@ export const contentPanels: Record<string, PanelDef[]> = {
   'agent-tool/context': [
     { label: 'Illustration', animation: 'context-inheritance' },
   ],
+  'architecture-flow/system-prompt': [
+    { label: 'Illustration', animation: 'system-prompt', layout: 'split' },
+  ],
   'background-calls/cache': [
     { label: 'Illustration', animation: 'cache', layout: 'split' },
   ],

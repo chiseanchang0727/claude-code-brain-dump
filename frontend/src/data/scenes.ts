@@ -66,13 +66,6 @@ export const scenes: SceneDef[] = [
     crumb: 'QueryEngine',
     boxes: [
       {
-        id: 'system-prompt',
-        label: 'System Prompt',
-        sublabel: 'fetchSystemPromptParts()',
-        x: 10, y: 68,
-        detail: { contentKey: 'architecture-flow/system-prompt' },
-      },
-      {
         id: 'tools',
         label: 'Tools',
         sublabel: 'what the model can do',
@@ -106,7 +99,7 @@ export const scenes: SceneDef[] = [
         sublabel: 'compose instructions',
         x: 28, y: 48,
         variant: 'amber',
-        description: 'Assembles all inputs into the system prompt sent to the model this turn.',
+        detail: { contentKey: 'architecture-flow/system-prompt', defaultPanel: 0 },
       },
       {
         id: 'understand',
@@ -172,7 +165,6 @@ export const scenes: SceneDef[] = [
       },
     ],
     arrows: [
-      { from: 'system-prompt', to: 'prepare' },
       { from: 'tools',         to: 'prepare' },
       { from: 'model-config',  to: 'prepare' },
       { from: 'mcp-servers',   to: 'prepare' },
@@ -189,7 +181,7 @@ export const scenes: SceneDef[] = [
     regions: [
       {
         label: 'QueryEngine',
-        boxes: ['system-prompt', 'tools', 'model-config', 'mcp-servers', 'custom-prompts', 'prepare', 'understand', 'save', 'run', 'transcript-file', 'disk', 'per-turn-state', 'merge', 'session-state'],
+        boxes: ['tools', 'model-config', 'mcp-servers', 'custom-prompts', 'prepare', 'understand', 'save', 'run', 'transcript-file', 'disk', 'per-turn-state', 'merge', 'session-state'],
         padding: 48,
         color: '#52525b',
         labelAlign: 'center',

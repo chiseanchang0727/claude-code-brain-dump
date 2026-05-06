@@ -49,7 +49,7 @@ const ROWS: {
       <div className="flex items-start gap-2">
         <span className="text-amber-400 font-mono text-xs shrink-0 mt-0.5">❯</span>
         <span className="text-zinc-200 text-xs leading-relaxed">
-          Add a loading spinner to the submit button
+          create an agent that parses sales data and generates a report
         </span>
       </div>
     ),
@@ -64,19 +64,19 @@ const ROWS: {
       <div className="flex flex-col gap-1 text-xs">
         <div className="flex gap-2">
           <span className="text-zinc-600">↳</span>
-          <span className="text-zinc-500">Reading the submit button code</span>
+          <span className="text-zinc-500">Reading sales data schema and samples</span>
         </div>
         <div className="flex gap-2">
           <span className="text-zinc-600">↳</span>
-          <span className="text-zinc-500">Checking how styles are set up</span>
+          <span className="text-zinc-500">Spawning agent to parse and aggregate</span>
         </div>
         <div className="flex gap-2">
           <span className="text-green-600">↳</span>
-          <span className="text-zinc-400">Adding the spinner and updating the button</span>
+          <span className="text-zinc-400">Writing report.md with findings</span>
         </div>
         <div className="flex gap-2">
           <span className="text-blue-500">↳</span>
-          <span className="text-zinc-400">Verifying the changes compile</span>
+          <span className="text-zinc-400">Verifying output is complete</span>
         </div>
       </div>
     ),
@@ -90,7 +90,7 @@ const ROWS: {
     left: (
       <div className="flex flex-col gap-1.5 text-xs">
         <p className="text-zinc-300 leading-relaxed">
-          Done. The button now shows a spinner while submitting and disables itself to prevent double clicks.
+          Done. report.md generated — revenue by region, top SKUs, and month-over-month trend.
         </p>
         <div className="flex gap-2 text-zinc-600 font-mono text-[10px] pt-1 border-t border-zinc-800">
           <span>3 turns</span>
