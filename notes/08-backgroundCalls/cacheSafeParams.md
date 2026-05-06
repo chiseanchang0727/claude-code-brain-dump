@@ -4,22 +4,24 @@ Reference: [src/utils/forkedAgent.ts](../../src/utils/forkedAgent.ts) (lines 46-
 
 ## Full Cache Structure Per API Call `#prompt-cache`
 
-Every API call has **three separate cache layers**, each with its own marker:
+Every API call has **two cache markers** — one on the system prompt, one on the last message:
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│  system prompt blocks       ← cache_control markers here │
-│    [attribution header]       (no marker — billing meta) │
-│    [static blocks*]           cache_control: global      │
-│    [dynamic blocks]           (no marker — per-session)  │
-│                                                          │
-│  tools array                ← marker here if MCP present │
-│    [built-in tools]                                      │
-│    [MCP tools]              cache_control: org           │
-│                                                          │
-│  messages                   ← one marker on last message │
-│    [msg1, msg2, ..., msgN]  cache_control: ephemeral     │
-└─────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────┐
+│  system prompt blocks         ← cache_control marker here    │
+│    [attribution header]         (no marker — billing meta)   │
+│    [static blocks*]             cache_control: global        │
+│    [dynamic blocks]             (no marker — per-session)    │
+│                                 * scope drops to org if MCP  │
+│                                                              │
+│  tools array                  ← NO cache_control markers     │
+│    [built-in tools]             (covered by message marker   │
+│    [MCP tools if any]            at ephemeral scope)         │
+│                                                              │
+│  messages                     ← one marker on last message   │
+│    [msg1, msg2, ..., msgN]      cache_control: ephemeral     │
+│                                 (covers sys + tools + msgs)  │
+└──────────────────────────────────────────────────────────────┘
 ```
 
 ### System Prompt Cache (`buildSystemPromptBlocks`, `claude.ts:3213`; `splitSysPromptPrefix`, `api.ts:321`)
@@ -42,14 +44,14 @@ The `global` scope is key: static parts of the system prompt (tool descriptions,
 Built-in tools are sorted and placed before MCP tools (see `tool-interface.md`). The cache marker placement depends on whether MCP tools are present:
 
 **No MCP tools (normal case):**
-- System prompt static blocks get `cacheScope: 'global'` — shared across **all** Claude Code users worldwide. Anthropic pre-warms this; your first call of the day is already a cache hit.
-- Tool schemas have no marker — they fall inside the globally-cached prefix automatically.
+- System prompt static blocks get `cacheScope: 'global'` — shared across **all** Claude Code users worldwide. Anthropic pre-warms this; your first call of the day is already a cache hit for the system prompt.
+- Tool schemas have **no** `cache_control` marker — they are covered by the per-session ephemeral message-level marker. The ephemeral marker on the last message caches system + tools + all prior messages. Tool schemas are stable within a session → cache hit every turn after the first.
 
 **MCP tools present (`needsToolBasedCacheMarker`, `claude.ts:1212`):**
-- System prompt blocks drop to `cacheScope: 'org'` — still cached, but only within your account. You lose the global warm-up; your first call of the session pays full price to create the cache entry.
-- Last built-in tool schema gets `cache_control: org` — the marker shifts here instead.
-- MCP tools are placed after the marker — they're per-user so they can't be org/globally cached.
-- Why the shift: MCP tools change per user. If the system prompt marker were used and an MCP tool changed, it would bust the entire prefix behind it. Putting the marker on the last stable built-in tool keeps the built-in block cacheable even when MCP tools change.
+- System prompt blocks drop to `cacheScope: 'org'` — still cached, but only within your account. You lose the cross-user global pre-warm; your first call of the session pays full price to warm the system prompt cache.
+- Tool schemas still have **no** `cache_control` marker — same as the no-MCP case, covered by the ephemeral message marker.
+- Why the scope downgrade: MCP tools are per-user. If the system prompt kept `global` scope, Anthropic would need to cache a different prefix per user — that's incompatible with cross-user sharing. Dropping to `org` scope limits caching to your account.
+- Note: the variable name `needsToolBasedCacheMarker` is aspirational — the intended design was to put an `org`-scoped marker on the last built-in tool (protecting it from MCP-caused cache busting). The current code only implements the scope downgrade on the system prompt. The `GlobalCacheStrategy` value when MCP is present is `'none'` (no global caching), not `'tool_based'`.
 
 ### Example: Normal Session (No MCP)
 
@@ -82,8 +84,8 @@ API request:
   tools: [
     { name: "Bash", ... },
     { name: "Read", ... },
-    { name: "WebFetch", ..., cache_control: { type: "ephemeral", scope: "org" } },  ← last built-in
-    { name: "mcp__github__search", ... },  ← MCP tools after marker, dynamic
+    { name: "WebFetch", ... },             ← no cache_control on any tool
+    { name: "mcp__github__search", ... },
     { name: "mcp__slack__send", ... },
   ]
   messages: [
@@ -92,7 +94,7 @@ API request:
   ]
 ```
 
-System prompt is cached at `org` scope (not global — you warm it yourself). Built-in tools before the MCP marker are stable → cache hit within your account. MCP suffix changes per user → not cached.
+System prompt is cached at `org` scope (you warm it yourself, not globally pre-warmed). All tools (built-in + MCP) are covered by the ephemeral message-level marker — same as the no-MCP case, just with org-scoped system prompt instead of global.
 
 ---
 
