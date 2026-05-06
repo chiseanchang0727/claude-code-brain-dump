@@ -1,7 +1,5 @@
 # Memory Extraction
 
-**File:** `src/services/extractMemories/extractMemories.ts`
-
 The write side of the memory system. Two paths create memory files — they are mutually exclusive within a single turn.
 
 ## Path 1 — Direct write (user-initiated)
@@ -25,3 +23,5 @@ If the main agent already wrote to memory files this turn (Path 1), the backgrou
 ## Overlap guard
 
 Only one extraction runs at a time. If a second extraction triggers while one is running, it's stashed as `pendingContext` and runs as a trailing extraction after the current one finishes — never dropped, never concurrent.
+
+**File:** `src/services/extractMemories/extractMemories.ts`

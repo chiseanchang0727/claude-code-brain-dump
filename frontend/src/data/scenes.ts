@@ -383,7 +383,7 @@ export const scenes: SceneDef[] = [
         sublabel: 'per-session · feeds compaction',
         x: 50, y: 75,
         variant: 'ghost',
-        detail: { contentKey: 'memory-system/session-memory' },
+        detail: { contentKey: 'memory-system/session-memory', defaultPanel: 0 },
       },
       {
         id: 'prompt-cache',
@@ -417,6 +417,7 @@ export const scenes: SceneDef[] = [
     id: 'agent-tool',
     title: 'AgentTool — Subagent Architecture',
     crumb: 'AgentTool',
+    hideDiagramTab: true,
     panels: [
       { label: 'Illustration', animation: 'agent-tool-flow' },
     ],

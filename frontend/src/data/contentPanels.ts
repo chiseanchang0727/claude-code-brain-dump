@@ -34,6 +34,9 @@ export const contentPanels: Record<string, PanelDef[]> = {
   'background-calls/cache': [
     { label: 'Illustration', animation: 'cache', layout: 'split' },
   ],
+  'memory-system/session-memory': [
+    { label: 'Illustration', animation: 'session-memory', layout: 'split' },
+  ],
   'memory-system/extraction': [
     { label: 'Illustration', animation: 'extraction', layout: 'split' },
   ],

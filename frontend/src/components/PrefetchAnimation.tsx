@@ -2,7 +2,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { usePhasePlayer } from '../hooks/usePhasePlayer'
 
 const PHASES = ['idle', 'query', 'scan', 'select', 'inject'] as const
-const PHASE_DURATIONS = [600, 2500, 2500, 3000, 3000]
+const PHASE_DURATIONS = [3000, 5000, 5000, 5000, 5000]
 
 const ALL_FILES = [
   { id: 'f1', name: 'user_role.md',        desc: 'senior eng, Go expert' },
@@ -96,7 +96,7 @@ export function PrefetchAnimation() {
         <AnimatePresence mode="wait">
           {phase === 'idle' && (
             <motion.p key="idle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="text-zinc-600 text-xs">relevance-based memory injection</motion.p>
+              className="text-zinc-300 text-xs">relevance-based memory injection</motion.p>
           )}
           {phase === 'query' && (
             <motion.p key="q" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}

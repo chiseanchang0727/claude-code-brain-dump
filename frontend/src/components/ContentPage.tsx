@@ -22,6 +22,7 @@ import { ApiStreamAnimation } from './ApiStreamAnimation'
 import { StopHooksAnimation } from './StopHooksAnimation'
 import { ContextInheritanceAnimation } from './ContextInheritanceAnimation'
 import { SystemPromptAnimation } from './SystemPromptAnimation'
+import { SessionMemoryAnimation } from './SessionMemoryAnimation'
 import { theme } from '../theme'
 
 interface Props {
@@ -51,6 +52,7 @@ function PanelContent({ animation }: { animation?: string }) {
   if (animation === 'stop-hooks') return <StopHooksAnimation />
   if (animation === 'context-inheritance') return <ContextInheritanceAnimation />
   if (animation === 'system-prompt') return <SystemPromptAnimation />
+  if (animation === 'session-memory') return <SessionMemoryAnimation />
   return null
 }
 

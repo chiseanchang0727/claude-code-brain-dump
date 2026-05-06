@@ -2,7 +2,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { usePhasePlayer } from '../hooks/usePhasePlayer'
 
 const PHASES = ['idle', 'p1-trigger', 'p1-write', 'or', 'p2-trigger', 'p2-fork', 'p2-done'] as const
-const PHASE_DURATIONS = [600, 2500, 3000, 1200, 2500, 3000, 3000]
+const PHASE_DURATIONS = [2000, 3000, 4000, 3000, 3000, 5000, 6000]
 
 export function ExtractionAnimation() {
   const { phase, cycle, prev, next, reset, autoPlay, setAutoPlay } =
@@ -45,7 +45,7 @@ export function ExtractionAnimation() {
             <motion.div key="or"
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               className="flex items-center justify-center h-[110px]">
-              <span className="text-zinc-600 text-sm font-mono tracking-widest">— or —</span>
+              <span className="text-zinc-300 text-sm font-mono tracking-widest">— or —</span>
             </motion.div>
           )}
 
