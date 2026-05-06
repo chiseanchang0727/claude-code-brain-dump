@@ -49,7 +49,7 @@ const PHASE_LABELS: Record<Phase, string> = {
   compact:   'old results cleared',
   pause:     'done',
 }
-const PHASE_DURATIONS = [2000, 2000, 2000, 2500]
+const PHASE_DURATIONS = [3500, 3500, 4000, 4000]
 
 export function MicrocompactAnimation() {
   const [mode, setMode] = useState<Mode>('time')

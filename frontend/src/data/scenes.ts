@@ -122,7 +122,7 @@ export const scenes: SceneDef[] = [
         label: 'Run',
         sublabel: 'hand off to query loop',
         x: 88, y: 48,
-        variant: 'amber',
+        variant: 'yellow',
         navigateTo: 'query-loop-detail',
       },
       {
@@ -198,6 +198,7 @@ export const scenes: SceneDef[] = [
         label: 'QueryEngine ↔ query loop',
         contentKey: 'query-engine-detail/async-generator',
         animation: 'async-generator',
+        layout: 'split',
       },
     ],
   },

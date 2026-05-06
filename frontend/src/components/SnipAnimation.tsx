@@ -52,7 +52,7 @@ const PHASE_LABELS: Record<Phase, string> = {
   snip:     'removing flagged messages',
   done:     'snipTokensFreed reported',
 }
-const PHASE_DURATIONS = [1500, 2000, 1500, 2000, 3000]
+const PHASE_DURATIONS = [3000, 4000, 3000, 4000, 6000]
 
 const TOTAL_SNIPPED = 1200 + 2100 + 4800
 

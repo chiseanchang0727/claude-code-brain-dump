@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { usePhasePlayer } from '../hooks/usePhasePlayer'
 
-const PHASES = ['idle', 'static-blocks', 'boundary', 'dynamic-blocks', 'tools', 'messages'] as const
+const PHASES = ['idle', 'static-blocks', 'tools', 'boundary', 'dynamic-blocks', 'messages'] as const
 const PHASE_DURATIONS = [1000, 3500, 3000, 3000, 3000, 4000]
 
 function phaseIndex(phase: string) {
@@ -15,9 +15,9 @@ export function SystemPromptAnimation() {
   const idx = phaseIndex(phase)
 
   const showStatic   = idx >= phaseIndex('static-blocks')
+  const showTools    = idx >= phaseIndex('tools')
   const showBoundary = idx >= phaseIndex('boundary')
   const showDynamic  = idx >= phaseIndex('dynamic-blocks')
-  const showTools    = idx >= phaseIndex('tools')
   const showMessages = idx >= phaseIndex('messages')
 
   return (
@@ -73,7 +73,14 @@ export function SystemPromptAnimation() {
                         <div className="text-xs font-mono text-zinc-300">Tool schemas</div>
                         <div className="text-[11px] text-zinc-500 mt-0.5">descriptions + input schemas</div>
                       </div>
-                      <span className="text-[10px] font-mono bg-green-950 border border-green-700 text-green-400 rounded px-1.5 py-0.5 whitespace-nowrap shrink-0">cache_control</span>
+                      <AnimatePresence>
+                        {showBoundary && (
+                          <motion.span key="marker" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
+                            className="text-[10px] font-mono bg-green-950 border border-green-700 text-green-400 rounded px-1.5 py-0.5 whitespace-nowrap shrink-0">
+                            cache_control
+                          </motion.span>
+                        )}
+                      </AnimatePresence>
                     </div>
                   </motion.div>
                 )}
@@ -145,17 +152,17 @@ export function SystemPromptAnimation() {
             <motion.p key="sb" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               className="text-zinc-400 text-xs">static blocks are identical for every Claude Code user — base instructions and model config never change between sessions</motion.p>
           )}
+          {phase === 'tools' && (
+            <motion.p key="t" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              className="text-zinc-400 text-xs">tool schemas are stable across turns — they sit alongside the static blocks as part of the cached prefix</motion.p>
+          )}
           {phase === 'boundary' && (
             <motion.p key="bd" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="text-zinc-400 text-xs"><span className="font-mono text-zinc-300">SYSTEM_PROMPT_DYNAMIC_BOUNDARY</span> splits the prompt — static blocks above get <span className="text-green-400">cache_control</span> markers. Anthropic pre-warms this cache; your first call is already a hit.</motion.p>
+              className="text-zinc-400 text-xs"><span className="text-green-400">cache prefix</span> ends here — everything above is stable and cached. Anthropic pre-warms it; your first call is already a hit.</motion.p>
           )}
           {phase === 'dynamic-blocks' && (
             <motion.p key="db" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               className="text-zinc-400 text-xs">dynamic blocks change per session — git status, injected memory, MCP server prompts. No marker; never cached.</motion.p>
-          )}
-          {phase === 'tools' && (
-            <motion.p key="t" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="text-zinc-400 text-xs">tool schemas sit before the dynamic boundary — they're part of the stable cached prefix and don't need their own marker</motion.p>
           )}
           {phase === 'messages' && (
             <motion.p key="m" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}

@@ -24,7 +24,7 @@ export const theme = {
     bg: {
       default: 'bg-zinc-800 text-zinc-100',
       green: 'bg-green-950/60 text-green-100',
-      yellow: 'bg-yellow-950/60 text-yellow-100',
+      yellow: 'bg-yellow-400/20 text-yellow-200',
       blue: 'bg-blue-950/60 text-blue-100',
       amber: 'bg-orange-950/60 text-orange-100',
       red: 'bg-red-950/60 text-red-100',
@@ -43,9 +43,9 @@ export const theme = {
         selected: 'border-green-400 shadow-green-900',
       },
       yellow: {
-        idle: 'border-yellow-800',
-        hover: 'hover:border-yellow-500',
-        selected: 'border-yellow-400 shadow-yellow-900',
+        idle: 'border-yellow-500',
+        hover: 'hover:border-yellow-300',
+        selected: 'border-yellow-300 shadow-yellow-700',
       },
       blue: {
         idle: 'border-blue-800',
@@ -75,7 +75,7 @@ export const theme = {
     sublabel: {
       default: 'text-zinc-500',
       green: 'text-green-500',
-      yellow: 'text-yellow-500',
+      yellow: 'text-yellow-400',
       blue: 'text-blue-500',
       amber: 'text-orange-500',
       red: 'text-red-500',

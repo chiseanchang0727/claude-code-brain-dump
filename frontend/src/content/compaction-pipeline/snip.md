@@ -1,8 +1,5 @@
 # Snip Compact
 
-**File:** `src/query.ts:401`  
-**Availability:** Internal only — gated behind `feature('HISTORY_SNIP')`
-
 The most surgical strategy. Removes the least important chunks from history while protecting recent messages.
 
 ## What it does
@@ -24,3 +21,6 @@ Unknown — logic lives in `snipCompact.ts` which is not in this repo. The strat
 ## Why surgical removal?
 
 Unlike microcompact (which empties content) or autocompact (which replaces everything with a summary), snip removes entire message chunks. This preserves the structure of remaining messages while freeing the most tokens per operation.
+
+**File:** `src/query.ts:401`  
+**Availability:** Internal only — gated behind `feature('HISTORY_SNIP')`

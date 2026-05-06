@@ -1,19 +1,15 @@
 # QueryEngine ↔ query loop
 
-`query()` is an **async generator** — it doesn't wait until the end to return everything. It yields each message as it arrives, one at a time.
+`query()` is an **async generator** — it yields each message as it arrives, one at a time. QueryEngine consumes them in a `for await` loop.
 
-## The for-await loop
+## Why two layers
 
-QueryEngine consumes it like this:
+Each layer has a distinct responsibility:
 
-```ts
-for await (const message of query(params)) {
-  // wakes up once per yielded message, while loop is still running
-  recordTranscript(message)
-  yield message  // pass it up to the UI
-}
-// only reaches here when query() returns Terminal
-```
+- **QueryEngine** — answers *what does a session remember?* Holds the full message history, accumulated cost, and permission state across every turn.
+- **query loop** — answers *what happens each iteration?* Drives the model call, tool execution, and streaming for a single turn, then hands the results back up.
+
+Splitting them means session state never leaks into the loop, and the loop never needs to know how long the conversation has been running.
 
 ## Lockstep, not sequential
 
@@ -28,10 +24,5 @@ They alternate control — one active, one waiting — never both running at the
 | … | … |
 | `return Terminal` | `for await` exits |
 
-## One drives, one reacts
+> `query()` is the **producer**. QueryEngine is the **consumer**. The loop drives the pace — QueryEngine reacts to each message as it arrives.
 
-The loop drives the pace. QueryEngine reacts to each message as it arrives.
-
-> `query()` is the **producer**. QueryEngine is the **consumer**. They run in lockstep.
-
-This is why you see `recordTranscript` calls inside QueryEngine's loop body rather than inside `query.ts` — the transcript is written by the consumer as each message surfaces, not by the producer deep inside the loop.

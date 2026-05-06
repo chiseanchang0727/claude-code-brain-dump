@@ -29,6 +29,40 @@ export function ScenePanel({ panel, onNavigateScene, onOpenContent }: Props) {
   if (!panel.animation && !panel.diagram && !parsed)
     return <p className="text-zinc-500 p-8">Content not found: {panel.contentKey}</p>
 
+  if (panel.layout === 'split' && panel.animation) {
+    const AnimComp = panel.animation === 'async-generator' ? AsyncGeneratorAnimation : null
+    if (AnimComp) return (
+      <div className="absolute inset-0 flex">
+        <div className="w-1/2 border-r border-zinc-800 p-8 overflow-hidden">
+          <AnimComp />
+        </div>
+        <div className="w-1/2 overflow-y-auto">
+          <div className="px-10 py-10">
+            <h1 className="text-white font-bold text-2xl mb-8">{parsed?.title}</h1>
+            <ReactMarkdown remarkPlugins={[remarkGfm]} components={{
+              h2:         ({ children }) => <h2 className={md.h2}>{children}</h2>,
+              h3:         ({ children }) => <h3 className={md.h3}>{children}</h3>,
+              p:          ({ children }) => <p className={md.p}>{children}</p>,
+              ul:         ({ children }) => <ul className={md.ul}>{children}</ul>,
+              ol:         ({ children }) => <ol className={md.ol}>{children}</ol>,
+              li:         ({ children }) => <li className="leading-relaxed">{children}</li>,
+              strong:     ({ children }) => <strong className={md.strong}>{children}</strong>,
+              blockquote: ({ children }) => <blockquote className={md.blockquote}>{children}</blockquote>,
+              pre:        ({ children }) => <>{children}</>,
+              code: ({ children, className }) =>
+                className?.includes('language-')
+                  ? <code className={`block ${md.codeBlock}`}>{children}</code>
+                  : <code className={md.codeInline}>{children}</code>,
+              table: ({ children }) => <div className="overflow-x-auto mb-4"><table className="w-full text-sm border-collapse">{children}</table></div>,
+              th: ({ children }) => <th className={md.th}>{children}</th>,
+              td: ({ children }) => <td className={md.td}>{children}</td>,
+            }}>{parsed?.body ?? ''}</ReactMarkdown>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="overflow-y-auto h-full">
       {panel.animation === 'transcript' && (

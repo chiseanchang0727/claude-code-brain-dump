@@ -49,7 +49,7 @@ const PHASE_LABELS: Record<Phase, string> = {
   project:   'projectView() applied — model sees summary',
   preserved: 'originals intact — reversible at any time',
 }
-const PHASE_DURATIONS = [1800, 2200, 2500, 3000]
+const PHASE_DURATIONS = [3000, 3000, 4000, 4000]
 
 const ARCHIVED_COUNT = MESSAGES.filter(m => m.archived).length
 
