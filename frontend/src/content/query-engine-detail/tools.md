@@ -1,7 +1,5 @@
 # Tools
 
-**File:** `src/Tool.ts`, `src/tools.ts`
-
 45+ tools, each a self-contained unit. `src/tools.ts` is the registry that composes the active set based on feature flags and permissions.
 
 ## The `Tool` type
@@ -52,3 +50,5 @@ Many tools are conditionally included via feature flags or `process.env` checks 
 - `REPL_ONLY_TOOLS` hidden when REPL mode is active
 - Coordinator-mode tools (`TaskStop`, `SendMessage`) only appear in coordinator builds
 - `ToolSearchTool` only included when tool search is optimistically enabled
+
+**File:** `src/Tool.ts`, `src/tools.ts`
