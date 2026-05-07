@@ -2,28 +2,31 @@
 
 **File:** `src/query.ts:1363–1409`
 
-Runs when `needsFollowUp = true` — the model returned one or more `tool_use` blocks.
+Runs when `needsFollowUp = true` — the model returned one or more tool calls.
+
+```
+┌─────────────────┐
+│   tool block    │  ← model returns this
+│   Read file.ts  │
+└────────┬────────┘
+         ↓
+    execution path
+```
 
 ## Two execution paths
 
 ### Streaming path — StreamingToolExecutor
 
-If streaming tool execution was enabled during the API call, tools started executing **while the model was still responding**. This path consumes the already-running tool futures, waiting for any that haven't finished yet.
+If streaming was enabled, tools started executing **while the model was still responding**. This path waits for any that haven't finished.
 
 ### Sequential path — runTools
 
-If streaming execution wasn't used, all tool calls are dispatched now, in the order the model requested them.
+If streaming wasn't used, all tool calls are dispatched now, in order.
 
 ## Permission check
 
-Every tool call goes through `canUseTool()` before execution:
-
-- Checks against the user's permission settings
-- Checks against previously denied tools in this session
-- If denied, returns a synthetic tool result explaining the denial
-
-The model sees the denial as a regular tool result and can decide how to proceed.
+Every tool call goes through `canUseTool()` before execution. If denied, returns a synthetic result explaining the denial — the model sees it as a regular result.
 
 ## Tool result shape
 
-Each executed tool returns a `tool_result` block with the tool's ID matched to the corresponding `tool_use` block. The model needs a result for every `tool_use` — `yieldMissingToolResultBlocks` ensures orphaned tool calls always get a synthetic result.
+Each tool returns a `tool_result` matched to its call. `yieldMissingToolResultBlocks` ensures orphaned calls always get a synthetic result.

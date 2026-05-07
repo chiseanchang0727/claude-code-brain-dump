@@ -29,12 +29,13 @@ interface Props {
   contentKey: string
   direction: number
   defaultPanel?: number
+  onOpenContent?: (contentKey: string, crumb: string, defaultPanel?: number) => void
 }
 
 const md = theme.panel.md
 
-function PanelContent({ animation }: { animation?: string }) {
-  if (animation === 'transcript') return <TranscriptAnimation />
+function PanelContent({ animation, onOpenContent }: { animation?: string; onOpenContent?: (contentKey: string, crumb: string, defaultPanel?: number) => void }) {
+  if (animation === 'transcript') return <TranscriptAnimation onOpenContent={onOpenContent} />
   if (animation === 'async-generator') return <AsyncGeneratorAnimation />
   if (animation === 'microcompact') return <MicrocompactAnimation />
   if (animation === 'snip') return <SnipAnimation />
@@ -92,7 +93,7 @@ function MarkdownBody({ parsed, contentKey }: { parsed: ReturnType<typeof parseC
   )
 }
 
-export function ContentPage({ contentKey, direction, defaultPanel }: Props) {
+export function ContentPage({ contentKey, direction, defaultPanel, onOpenContent }: Props) {
   const raw = getContent(contentKey)
   const parsed = raw ? parseContent(raw) : null
   const panels = contentPanels[contentKey] ?? []
@@ -144,7 +145,7 @@ export function ContentPage({ contentKey, direction, defaultPanel }: Props) {
         {isSplit ? (
           <div className="absolute inset-0 flex">
             <div className="w-1/2 border-r border-zinc-800 p-8 overflow-hidden">
-              <PanelContent animation={activePanelDef!.animation} />
+              <PanelContent animation={activePanelDef!.animation} onOpenContent={onOpenContent} />
             </div>
             <div className="w-1/2 overflow-y-auto">
               <div className="px-10 py-10">
@@ -154,7 +155,7 @@ export function ContentPage({ contentKey, direction, defaultPanel }: Props) {
           </div>
         ) : activePanel !== null ? (
           <div className="w-full h-full p-8">
-            <PanelContent animation={panels[activePanel].animation} />
+            <PanelContent animation={panels[activePanel].animation} onOpenContent={onOpenContent} />
           </div>
         ) : (
           <div className="overflow-y-auto h-full">

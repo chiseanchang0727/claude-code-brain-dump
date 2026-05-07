@@ -16,6 +16,7 @@ export interface BoxDef {
   detail?: DetailDef
   navigateTo?: string
   elevated?: boolean    // render above the SVG arrow/region layer
+  dashed?: boolean      // dashed border style
 }
 
 export interface ArrowDef {

@@ -82,7 +82,11 @@ function arrowPoints(from: NodeSpec, to: NodeSpec, W: number, H: number) {
   return { x1: fx, y1: fy + Math.sign(dy) * NODE_HH, x2: tx, y2: ty - Math.sign(dy) * NODE_HH }
 }
 
-export function TranscriptAnimation() {
+interface Props {
+  onOpenContent?: (contentKey: string, crumb: string, defaultPanel?: number) => void
+}
+
+export function TranscriptAnimation({ onOpenContent }: Props) {
   const [mode, setMode] = useState<Mode>('build')
   const containerRef = useRef<HTMLDivElement>(null)
   const branchHistoryBoxRef = useRef<HTMLDivElement>(null)

@@ -55,6 +55,7 @@ export function Box({ box, editMode, bubbleOpen, onToggleBubble, onNavigateScene
         whileHover={editMode ? { scale: 1.03 } : isInteractive ? { scale: 1.06 } : undefined}
         className={`select-none px-4 py-2.5 rounded-xl border-2 text-center w-40 transition-colors duration-200
           ${editMode ? 'cursor-grab active:cursor-grabbing' : isInteractive ? 'cursor-pointer' : 'cursor-default'}
+          ${box.dashed ? 'border-dashed' : ''}
           ${theme.box.bg[v]} ${b.idle} ${b.hover}`}
       >
         <div className="text-sm font-semibold leading-tight">{box.label}</div>

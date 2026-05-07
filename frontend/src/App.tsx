@@ -37,6 +37,7 @@ export default function App() {
               contentKey={current.contentKey}
               direction={direction}
               defaultPanel={current.type === 'content' ? current.defaultPanel : undefined}
+              onOpenContent={pushContent}
             />
           )}
         </AnimatePresence>

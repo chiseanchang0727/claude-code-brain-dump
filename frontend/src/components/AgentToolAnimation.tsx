@@ -1,5 +1,34 @@
+import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { usePhasePlayer } from '../hooks/usePhasePlayer'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+import { theme } from '../theme'
+
+const md = theme.panel.md
+
+const mdComponents = {
+  h2:         ({ children }: any) => <h2 className={`${md.h2} text-sm mt-5 mb-2`}>{children}</h2>,
+  h3:         ({ children }: any) => <h3 className={`${md.h3} text-xs mt-4 mb-1`}>{children}</h3>,
+  p:          ({ children }: any) => <p className={`${md.p} text-xs`}>{children}</p>,
+  ul:         ({ children }: any) => <ul className={`${md.ul} text-xs`}>{children}</ul>,
+  ol:         ({ children }: any) => <ol className={`${md.ol} text-xs`}>{children}</ol>,
+  li:         ({ children }: any) => <li className="leading-relaxed">{children}</li>,
+  strong:     ({ children }: any) => <strong className={md.strong}>{children}</strong>,
+  blockquote: ({ children }: any) => <blockquote className={md.blockquote}>{children}</blockquote>,
+  pre:        ({ children }: any) => <>{children}</>,
+  code: ({ children, className }: any) =>
+    className?.includes('language-')
+      ? <code className={`block ${md.codeBlock} text-xs`}>{children}</code>
+      : <code className={`${md.codeInline} text-[10px]`}>{children}</code>,
+  table: ({ children }: any) => (
+    <div className="mb-3">
+      <table className="w-full text-xs border-collapse">{children}</table>
+    </div>
+  ),
+  th: ({ children }: any) => <th className={`${md.th} px-2 py-2 text-left`}>{children}</th>,
+  td: ({ children }: any) => <td className={`${md.td} px-2 py-2 leading-relaxed`}>{children}</td>,
+}
 
 const PHASES = ['idle', 'parent-convo', 'decision', 'fork-spawn', 'fork-inherit', 'fork-run', 'named-spawn', 'named-run'] as const
 const PHASE_DURATIONS = [600, 2500, 2000, 1500, 3000, 3500, 3000, 3500]
@@ -19,7 +48,71 @@ const MOCK_MESSAGES = [
   { role: 'assistant', text: 'updating now'             },
 ]
 
+type RightTab = 'agent-types' | 'when-to-fork'
+
+const AGENT_TYPES_CONTENT = `## By Source
+
+| Type | Source | Definition |
+|---|---|---|
+| Built-in | \`source: 'built-in'\` | Hardcoded in \`src/tools/AgentTool/built-in/\` |
+| Custom | \`source: 'userSettings'\` / \`'projectSettings'\` / \`'policySettings'\` | User-defined \`.md\` files in \`.claude/agents/\` |
+| Plugin | \`source: 'plugin'\` | From installed plugins |
+
+## Built-in Agents
+
+| Agent | subagent_type | Purpose |
+|---|---|---|
+| general-purpose | \`"general-purpose"\` | Default — research, code search, multi-step tasks |
+| Explore | \`"Explore"\` | Fast codebase exploration — Glob, Grep, Read only |
+| Plan | \`"Plan"\` | Software architect — designs implementation plans |
+| claude-code-guide | \`"claude-code-guide"\` | Answers questions about Claude Code |
+
+**Special cases:**
+- \`worker\` — only in coordinator mode (swarm/multi-agent)
+- \`fork\` — implicit fork when \`subagent_type\` omitted
+
+## Resolution Order
+
+1. Look up in \`activeAgents\` list
+2. If not found and fork experiment on → implicit fork
+3. If not found and fork off → fall back to \`general-purpose\`
+`
+
+const WHEN_TO_FORK_CONTENT = `*Organized from the prompt in \`src/tools/AgentTool/prompt.ts\`*
+
+## Fork vs Named Subagent
+
+| | Named Subagent | Fork |
+|---|---|---|
+| Call | \`subagent_type: "Explore"\` | Omit \`subagent_type\` |
+| Context | Starts fresh — zero context | Inherits full parent conversation |
+| Cache | Cold start (expensive) | Shares parent's prompt cache (cheap) |
+| Prompt style | Full briefing needed | Short directive — it already knows |
+| Use case | Specialized task (explore, plan, review) | "I don't need this output in my context" |
+
+## Decision Rule
+
+- **Yes, I need this output** → do it yourself (keep in context)
+- **No, I don't need it** → fork (results stay out, notification when done)
+
+## Use Cases
+
+- **Research**: fork open-ended questions. Launch parallel forks for independent questions. A fork beats a fresh subagent — it inherits context and shares your cache.
+- **Implementation**: prefer to fork implementation work that requires more than a couple of edits. Do research before jumping to implementation.
+
+## Rules
+
+**Forks are cheap** — share your prompt cache. Don't set \`model\` on a fork — a different model can't reuse the parent's cache. Pass a short \`name\` so the user can see the fork in the teams panel.
+
+**Don't peek.** The tool result includes an \`output_file\` path — do not Read or tail it unless the user explicitly asks. Reading mid-flight pulls the fork's tool noise into your context.
+
+**Don't race.** After launching, you know nothing about what the fork found. Never fabricate or predict fork results. If the user asks before notification lands, tell them the fork is still running.
+
+**Writing a fork prompt.** The fork inherits your context, so the prompt is a *directive* — what to do, not what the situation is. Be specific about scope.
+`
+
 export function AgentToolAnimation() {
+  const [rightTab, setRightTab] = useState<RightTab>('when-to-fork')
   const { phase, cycle, prev, next, reset, autoPlay, setAutoPlay } =
     usePhasePlayer(PHASES, PHASE_DURATIONS)
 
@@ -30,21 +123,23 @@ export function AgentToolAnimation() {
   const showAgentCall = !['idle', 'parent-convo'].includes(phase)
 
   return (
-    <div key={cycle} className="h-full flex flex-col py-5 px-6 gap-4 max-w-2xl mx-auto w-full">
+    <div key={cycle} className="h-full flex">
+      {/* Left side - Animation */}
+      <div className="w-1/2 flex flex-col py-5 px-6 gap-4 border-r border-zinc-800 min-w-0">
 
-      {/* Scenario pills */}
-      <div className="flex gap-2 shrink-0">
-        {[
-          { key: 'fork',  label: 'fork agent',  color: 'border-blue-800 bg-blue-950/30 text-blue-400'   },
-          { key: 'named', label: 'named agent', color: 'border-green-800 bg-green-950/30 text-green-400' },
-        ].map(s => (
-          <div key={s.key} className={`text-xs font-mono px-2 py-1 rounded border transition-all duration-300 ${
-            scenario === s.key ? s.color : 'border-zinc-800/50 text-zinc-700'
-          }`}>
-            {s.label}
-          </div>
-        ))}
-      </div>
+        {/* Scenario pills */}
+        <div className="flex gap-2 shrink-0">
+          {[
+            { key: 'fork',  label: 'fork agent',  color: 'border-blue-800 bg-blue-950/30 text-blue-400'   },
+            { key: 'named', label: 'named agent', color: 'border-green-800 bg-green-950/30 text-green-400' },
+          ].map(s => (
+            <div key={s.key} className={`text-xs font-mono px-2 py-1 rounded border transition-all duration-300 ${
+              scenario === s.key ? s.color : 'border-zinc-800/50 text-zinc-700'
+            }`}>
+              {s.label}
+            </div>
+          ))}
+        </div>
 
       {/* Main area: trunk + agent box + annotation */}
       <div className="flex-1 min-h-0 flex gap-3">
@@ -331,6 +426,40 @@ export function AgentToolAnimation() {
           <button onClick={prev}  className="text-zinc-500 hover:text-white text-xs transition-colors">← back</button>
           <button onClick={next}  className="text-zinc-500 hover:text-white text-xs transition-colors">next →</button>
           <button onClick={reset} className="text-zinc-500 hover:text-white text-xs transition-colors">↺</button>
+        </div>
+      </div>
+      </div>
+
+      {/* Right side - Content display */}
+      <div className="w-1/2 flex flex-col border-l border-zinc-800 min-w-0">
+        {/* Tabs */}
+        <div className="flex border-b border-zinc-800 shrink-0">
+          <button
+            onClick={() => setRightTab('when-to-fork')}
+            className={`flex-1 px-4 py-2 text-xs font-medium transition-colors ${
+              rightTab === 'when-to-fork'
+                ? 'text-amber-400 border-b-2 border-amber-400 bg-amber-950/20'
+                : 'text-zinc-500 hover:text-zinc-300'
+            }`}
+          >
+            When to Fork
+          </button>
+          <button
+            onClick={() => setRightTab('agent-types')}
+            className={`flex-1 px-4 py-2 text-xs font-medium transition-colors ${
+              rightTab === 'agent-types'
+                ? 'text-yellow-400 border-b-2 border-yellow-400 bg-yellow-950/20'
+                : 'text-zinc-500 hover:text-zinc-300'
+            }`}
+          >
+            Agent Types
+          </button>
+        </div>
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto p-4">
+          <ReactMarkdown remarkPlugins={[remarkGfm]} components={mdComponents}>
+            {rightTab === 'agent-types' ? AGENT_TYPES_CONTENT : WHEN_TO_FORK_CONTENT}
+          </ReactMarkdown>
         </div>
       </div>
     </div>

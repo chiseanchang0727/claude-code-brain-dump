@@ -22,7 +22,7 @@ export function Scene({ scene, direction, editMode, onNavigateScene, onOpenConte
   const [draggedPositions, setDraggedPositions] = useState<Record<string, { x: number; y: number }>>({})
   const [saving, setSaving] = useState(false)
   const hasPanels = scene.panels && scene.panels.length > 0
-  const [activePanel, setActivePanel] = useState<number | null>(hasPanels ? 0 : null)
+  const [activePanel, setActivePanel] = useState<number | null>(scene.hideDiagramTab ? 0 : null)
 
   useEffect(() => {
     const el = containerRef.current
@@ -36,8 +36,8 @@ export function Scene({ scene, direction, editMode, onNavigateScene, onOpenConte
 
   useEffect(() => {
     setDraggedPositions({})
-    setActivePanel(scene.panels && scene.panels.length > 0 ? 0 : null)
-  }, [scene.id])
+    setActivePanel(scene.hideDiagramTab ? 0 : null)
+  }, [scene.id, scene.hideDiagramTab])
 
   const effectiveBoxes: BoxDef[] = scene.boxes.map(box => ({
     ...box,
@@ -87,6 +87,16 @@ export function Scene({ scene, direction, editMode, onNavigateScene, onOpenConte
     >
       {hasPanels && !scene.hideDiagramTab && (
         <div className="flex shrink-0 border-b border-zinc-800 px-4">
+          <button
+            onClick={() => setActivePanel(null)}
+            className={`px-4 py-2.5 text-sm transition-colors border-b-2 -mb-px ${
+              activePanel === null
+                ? 'text-white border-amber-500'
+                : 'text-zinc-500 hover:text-zinc-300 border-transparent'
+            }`}
+          >
+            Diagram
+          </button>
           {scene.panels!.map((panel, i) => (
             <button
               key={i}
@@ -100,16 +110,6 @@ export function Scene({ scene, direction, editMode, onNavigateScene, onOpenConte
               {panel.label}
             </button>
           ))}
-          <button
-            onClick={() => setActivePanel(null)}
-            className={`px-4 py-2.5 text-sm transition-colors border-b-2 -mb-px ${
-              activePanel === null
-                ? 'text-white border-amber-500'
-                : 'text-zinc-500 hover:text-zinc-300 border-transparent'
-            }`}
-          >
-            Diagram
-          </button>
         </div>
       )}
 

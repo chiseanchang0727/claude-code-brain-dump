@@ -446,6 +446,22 @@ export const scenes: SceneDef[] = [
         detail: { contentKey: 'agent-tool/named' },
       },
       {
+        id: 'agent-types',
+        label: 'Agent Types',
+        sublabel: 'built-in · custom · plugin',
+        x: 76, y: 52,
+        variant: 'yellow',
+        detail: { contentKey: 'agent-tool/agent-types' },
+      },
+      {
+        id: 'when-to-fork',
+        label: 'When to Fork',
+        sublabel: 'decision criteria',
+        x: 24, y: 52,
+        variant: 'amber',
+        detail: { contentKey: 'agent-tool/when-to-fork' },
+      },
+      {
         id: 'context',
         label: 'Context Inheritance',
         sublabel: 'createSubagentContext()',
@@ -463,8 +479,10 @@ export const scenes: SceneDef[] = [
     arrows: [
       { from: 'entry',  to: 'fork',      label: 'no subagent_type' },
       { from: 'entry',  to: 'named',     label: 'subagent_type set' },
+      { from: 'fork',   to: 'when-to-fork' },
       { from: 'fork',   to: 'context',   label: 'inherits parent' },
       { from: 'fork',   to: 'isolation' },
+      { from: 'named',  to: 'agent-types' },
       { from: 'named',  to: 'isolation' },
     ],
     regions: [
@@ -487,10 +505,11 @@ export const scenes: SceneDef[] = [
     boxes: [
       {
         id: 'tool-blocks',
-        label: 'tool_use Blocks',
+        label: 'Incoming Calls',
         sublabel: 'from model response',
         x: 50, y: 12,
-        description: 'When the model decides to use a tool, it returns one or more tool_use blocks in its response. Each block has a tool name, a unique ID, and the input the model wants to pass.',
+        dashed: true,
+        description: 'When the model decides to use a tool, it returns one or more tool blocks in its response. Each block has a tool name, a unique ID, and the input the model wants to pass.',
       },
       {
         id: 'streaming',

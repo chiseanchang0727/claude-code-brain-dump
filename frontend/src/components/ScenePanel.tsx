@@ -67,7 +67,7 @@ export function ScenePanel({ panel, onNavigateScene, onOpenContent }: Props) {
     <div className="overflow-y-auto h-full">
       {panel.animation === 'transcript' && (
         <div className="border-b border-zinc-800" style={{ height: 300 }}>
-          <TranscriptAnimation />
+          <TranscriptAnimation onOpenContent={onOpenContent} />
         </div>
       )}
       {panel.animation === 'async-generator' && (
