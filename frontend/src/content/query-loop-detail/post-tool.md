@@ -2,21 +2,12 @@
 
 **File:** `src/query.ts:1538–1628`
 
-After tool results are collected, several housekeeping tasks run before the next iteration begins.
+Housekeeping after tool results are collected, before the next iteration.
 
-## Steps in order
+## Steps
 
-### Queued commands (line 1570)
-Drains pending notifications scoped to this agent's ID. Commands queued during tool execution are processed here.
-
-### Attachments (line 1580)
-Injects memory and context attachments back into the message stream so the model receives them on the next iteration.
-
-### Memory prefetch consume (line 1600)
-If memory prefetch has settled (started earlier, asynchronously), inject relevant memories into the context now. If not yet ready, skip and retry on the next iteration — **zero wait**.
-
-### Skill discovery consume (line 1620)
-Inject prefetched skill discovery results if available. Skills discovered during the turn become available for subsequent tool calls.
-
-### Tool use summary start (line 1469)
-Fires off an async **Haiku** call to generate a human-readable summary of the tool calls just executed. This result is consumed at **step 6 of the next iteration** — by the time the next API call finishes streaming, the summary is ready.
+1. **Queued commands** — process any notifications that arrived during tool execution
+2. **Attachments** — add memory/context files back into the conversation
+3. **Memory prefetch** — if background memory lookup finished, add those memories now (don't wait if still loading)
+4. **Skill discovery** — add any newly discovered skills
+5. **Tool summary** — start a Haiku call to summarize what tools just did (result used next iteration)

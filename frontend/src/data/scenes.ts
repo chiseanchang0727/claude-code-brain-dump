@@ -145,14 +145,14 @@ export const scenes: SceneDef[] = [
         label: 'Per-turn State',
         sublabel: 'lives only this turn',
         x: 88, y: 65,
-        description: 'query.ts creates a fresh State struct every turn: turnCount, toolUseContext, needsFollowUp, messagesForQuery. All of it is discarded the moment the turn ends — nothing carries over.',
+        description: 'Fresh state created each turn: iteration count, tool context, follow-up flag, messages. Discarded when the turn ends.',
       },
       {
         id: 'merge',
         label: 'Merge',
         sublabel: 'final messages → history',
         x: 62, y: 82,
-        description: 'When query() finishes, QueryEngine takes the final messages and merges them into mutableMessages. That is the only thing that survives into the next turn. The per-turn State is gone.',
+        description: 'Mechanical, not model-driven. When query() finishes, final messages are appended to session history. Per-turn state is discarded — only messages survive.',
       },
       {
         id: 'session-state',
@@ -161,7 +161,7 @@ export const scenes: SceneDef[] = [
         variant: 'ghost',
         x: 35, y: 82,
         elevated: true,
-        description: 'Same QueryEngine instance for the whole session. Holds mutableMessages (full history), totalUsage (accumulated cost), permissionDenials, and readFileState. Still here when the next user message arrives.',
+        description: 'Lives for the entire session. Stores conversation history, total cost, permission decisions, and file read cache. Ready when the next user message arrives.',
       },
     ],
     arrows: [
@@ -223,6 +223,7 @@ export const scenes: SceneDef[] = [
         label: 'Pre-process Messages',
         sublabel: 'compaction pipeline',
         x: 38, y: 20,
+        variant: 'blue',
         navigateTo: 'compaction-pipeline',
       },
       {
