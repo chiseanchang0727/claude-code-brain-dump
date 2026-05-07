@@ -142,7 +142,7 @@ export function AutocompactAnimation() {
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, height: 0, marginBottom: 0 }}
-              transition={{ delay: i * 0.08, duration: 0.25, exit: { delay: i * 0.03 } }}
+              transition={{ delay: i * 0.08, duration: 0.25 }}
               className="flex gap-2 items-start py-0.5 shrink-0"
             >
               <div className={`w-1.5 h-1.5 rounded-full mt-[5px] shrink-0 ${DOT[msg.role]}`} />

@@ -81,7 +81,7 @@ export function ScenePanel({ panel, onNavigateScene, onOpenContent }: Props) {
         </div>
       )}
       <div className="max-w-3xl mx-auto px-12 pt-8 pb-8">
-        <h1 className="text-white font-bold text-xl mb-6">{parsed.title}</h1>
+        <h1 className="text-white font-bold text-xl mb-6">{parsed?.title}</h1>
         <ReactMarkdown
           remarkPlugins={[remarkGfm]}
           components={{
@@ -107,7 +107,7 @@ export function ScenePanel({ panel, onNavigateScene, onOpenContent }: Props) {
             td: ({ children }) => <td className={md.td}>{children}</td>,
           }}
         >
-          {parsed.body}
+          {parsed?.body ?? ''}
         </ReactMarkdown>
       </div>
     </div>

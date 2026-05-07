@@ -86,7 +86,7 @@ interface Props {
   onOpenContent?: (contentKey: string, crumb: string, defaultPanel?: number) => void
 }
 
-export function TranscriptAnimation({ onOpenContent }: Props) {
+export function TranscriptAnimation({}: Props) {
   const [mode, setMode] = useState<Mode>('build')
   const containerRef = useRef<HTMLDivElement>(null)
   const branchHistoryBoxRef = useRef<HTMLDivElement>(null)

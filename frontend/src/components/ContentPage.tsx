@@ -32,8 +32,6 @@ interface Props {
   onOpenContent?: (contentKey: string, crumb: string, defaultPanel?: number) => void
 }
 
-const md = theme.panel.md
-
 function PanelContent({ animation, onOpenContent }: { animation?: string; onOpenContent?: (contentKey: string, crumb: string, defaultPanel?: number) => void }) {
   if (animation === 'transcript') return <TranscriptAnimation onOpenContent={onOpenContent} />
   if (animation === 'async-generator') return <AsyncGeneratorAnimation />
